@@ -22,17 +22,19 @@ public class Hero {
 		
 		position.add(velocity.cpy().scl(delta));
 
-        if (position.x < 5) {
-        	position.x = 5;
-        } else if (position.x > 115) {
-        	position.x = 115;
+        if (position.x < 12) {
+        	position.x = 12;
+        	velocity.x *= -1;
+        } else if (position.x > 107) {
+        	position.x = 107;
+        	velocity.x *= -1;
         }
         
-        if (position.y < 5) {
-        	position.y = 5;
+        if (position.y < 11) {
+        	position.y = 11;
         	velocity.y *= -1;
-        } else if (position.y > 200) {
-        	position.y = 200;
+        } else if (position.y > 216) {
+        	position.y = 216;
         	velocity.y *= -1;
         }
 

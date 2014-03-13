@@ -9,14 +9,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class AssetLoader {
 	
 	public static Texture texture;
-    public static TextureRegion bg, wallLeft, wallRight;
+    public static TextureRegion bg, wall, skullUp, platform, fire;
 
     public static Animation heroAnimation;
-    public static TextureRegion hero, heroDown, heroUp;
-    
-    public static TextureRegion platform;
+    public static TextureRegion heroMid, heroDown, heroUp;
 
-    //public static TextureRegion skullUp, skullDown, bar;
 
     public static void load() {
 
@@ -26,25 +23,27 @@ public class AssetLoader {
         bg = new TextureRegion(texture, 0, 0, 136, 43);
         bg.flip(false, true);
 
-        wallLeft = new TextureRegion(texture, 0, 43, 143, 11);
-
-        wallRight = new TextureRegion(wallLeft);
-        wallRight.flip(false, true);
+        fire = new TextureRegion(texture, 0, 43, 143, 11);
+        fire.flip(false, true);
+        
 
         heroDown = new TextureRegion(texture, 136, 0, 17, 12);
         heroDown.flip(false, true);
 
-        hero = new TextureRegion(texture, 153, 0, 17, 12);
-        hero.flip(false, true);
+        heroMid = new TextureRegion(texture, 153, 0, 17, 12);
+        heroMid.flip(false, true);
 
         heroUp = new TextureRegion(texture, 170, 0, 17, 12);
         heroUp.flip(false, true);
 
-        TextureRegion[] heros = { heroDown, hero, heroUp };
+        TextureRegion[] heros = { heroDown, heroMid, heroUp };
         heroAnimation = new Animation(0.06f, heros);
         heroAnimation.setPlayMode(Animation.LOOP_PINGPONG);
+        
+        wall = new TextureRegion(texture, 136, 16, 22, 3);
 
-        //skullUp = new TextureRegion(texture, 192, 0, 24, 14);
+        skullUp = new TextureRegion(texture, 192, 0, 24, 14);
+        skullUp.flip(false, true);
         // Create by flipping existing skullUp
         //skullDown = new TextureRegion(skullUp);
         //skullDown.flip(false, true);
