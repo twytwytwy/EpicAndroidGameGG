@@ -31,10 +31,15 @@ public class Platforms extends Scrollable {
 		if (Intersector.overlaps(hero.getBoundingCircle(), boundingBox)) {
 //			if ((hero.getX() + hero.getWidth()) / 2 > position.x
 //					&& (hero.getX() + hero.getWidth()) / 2 < position.x + width) {
-				System.out.println("collision\n!!!");
+				//System.out.println("collision\n!!!");
 				hero.setParams(position.y);
 //			}
 		}
+	}
+	
+	public void onRestart(float y, float scrollSpeed) {
+		velocity.y = scrollSpeed;
+		reset(y);
 	}
 
 	@Override

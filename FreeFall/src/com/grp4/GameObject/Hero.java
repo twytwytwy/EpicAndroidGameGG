@@ -7,75 +7,91 @@ public class Hero {
 	private Vector2 position;
 	private Vector2 velocity;
 	private Vector2 acceleration;
-	
+
 	private int width;
 	private int height;
-	
+
 	private Circle boundingCircle;
-	
-	public Hero (float x, float y, int width, int height) {
+
+	private boolean isAlive;
+
+	public Hero(float x, float y, int width, int height) {
 		this.width = width;
-        this.height = height;
-        position = new Vector2(x, y);
-        velocity = new Vector2(30, 0); // trying velocity as gravity
-        acceleration = new Vector2(0, 40); // gravity. positive Y downwards
-        
-        boundingCircle = new Circle();
+		this.height = height;
+		position = new Vector2(x, y);
+		velocity = new Vector2(-80, 0); // trying velocity as gravity
+		acceleration = new Vector2(0, 200); // gravity. positive Y downwards
+
+		boundingCircle = new Circle();
+
+		isAlive = true;
+	}
+
+	public void update(float delta) {
+
+		velocity.add(acceleration.cpy().scl(delta));
+
+		if (position.x < 12) {
+			position.x = 12;
+		} else if (position.x > 107) {
+			position.x = 107;
+		}
+
+		position.add(velocity.cpy().scl(delta));
+		boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
+
+	}
+
+	public void die() {
+		isAlive = false;
+		velocity.x = 0;
+		velocity.y = -100;
+		acceleration.y = 200;
 	}
 	
-	public void update(float delta) {
-		
-		velocity.add(acceleration.cpy().scl(delta));
-		
+	public void onRestart(int x, int y) {
+		position.y = y;
+		position.x = x;
+		velocity.x = -80;
+		velocity.y = 0;
+		acceleration.y = 200;
+		isAlive = true;
+	}
 
-        if (position.x < 12) {
-        	position.x = 12;
-        	velocity.x *= -1;
-        } else if (position.x > 107) {
-        	position.x = 107;
-        	velocity.x *= -1;
-        }
-        
-        if (position.y < 11) {
-        	position.y = 11;
-        } else if (position.y > 216) {
-        	position.y = 216;
-        	velocity.y = 0;
-        }
-        
-        position.add(velocity.cpy().scl(delta));
-        boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
+	public void onClick() {
+		if (isAlive) {
+			velocity.x *= -1;
+		}
+	}
 
-    }
+	public float getX() {
+		return position.x;
+	}
 
-    public void onClick() {
-        velocity.x *= -1;
-    }
+	public float getY() {
+		return position.y;
+	}
 
-    public float getX() {
-        return position.x;
-    }
+	public float getWidth() {
+		return width;
+	}
 
-    public float getY() {
-        return position.y;
-    }
+	public float getHeight() {
+		return height;
+	}
 
-    public float getWidth() {
-        return width;
-    }
+	public Circle getBoundingCircle() {
+		return boundingCircle;
+	}
 
-    public float getHeight() {
-        return height;
-    }
-    
-    public Circle getBoundingCircle() {
-        return boundingCircle;
-    }
-    
-    public void setParams(float y) {
-    	position.y = y - height;
-    	boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
-    	velocity.y = 0;
-    }
+	public boolean isAlive() {
+		return isAlive;
+	}
+
+	public void setParams(float y) {
+		position.y = y - height;
+		boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
+		velocity.y = 0;
+	}
 
 }

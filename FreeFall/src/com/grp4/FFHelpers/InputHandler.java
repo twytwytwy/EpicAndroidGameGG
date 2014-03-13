@@ -2,19 +2,31 @@ package com.grp4.FFHelpers;
 
 import com.badlogic.gdx.InputProcessor;
 import com.grp4.GameObject.Hero;
+import com.grp4.GameWorld.GameWorld;
 
 public class InputHandler implements InputProcessor {
 	
+	private GameWorld myWorld;
 	private Hero hero;
 	
-	public InputHandler(Hero hero) {
-		this.hero = hero;
+	public InputHandler(GameWorld myWorld) {
+		this.myWorld = myWorld;
+		this.hero = myWorld.getHero();
 	}
 	
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		hero.onClick();
-		return true;
+		if (myWorld.isReady()) {
+            myWorld.start();
+        }
+
+        hero.onClick();
+
+        if (myWorld.isGameOver()) {
+            myWorld.restart();
+        }
+
+        return true;
 	}
 
 

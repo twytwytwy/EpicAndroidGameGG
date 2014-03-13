@@ -10,5 +10,10 @@ public class Sides extends Scrollable {
 	public void reset(float newY) {
 		super.reset(newY);
 	}
+	
+	public void onRestart(float y, float scrollSpeed) {
+		position.y = y;
+		velocity.y = scrollSpeed;
+	}
 
 }

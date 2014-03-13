@@ -159,21 +159,52 @@ public class GameRenderer {
         batcher.draw(heroAnimation.getKeyFrame(runTime),
                 hero.getX(), hero.getY(), hero.getWidth(), hero.getHeight());
         
+        
+        
+        if (myWorld.isReady()) {
+            // Draw shadow first
+            AssetLoader.shadow.draw(batcher, "Touch me", (136 / 2)
+                    - (42), 76);
+            // Draw text
+            AssetLoader.font.draw(batcher, "Touch me", (136 / 2)
+                    - (42 - 1), 75);
+        } else if (myWorld.isGameOver()) {
+                AssetLoader.shadow.draw(batcher, "Game Over", 25, 56);
+                AssetLoader.font.draw(batcher, "Game Over", 24, 55);
+                
+                AssetLoader.shadow.draw(batcher, "Try again?", 23, 76);
+                AssetLoader.font.draw(batcher, "Try again?", 24, 75);
+        }
+        
+        
+        // Convert integer into String
+        String score = myWorld.getScore() + "";
+
+        // Draw shadow first
+        AssetLoader.shadow.draw(batcher, "" + myWorld.getScore(), 0, 1); //(136 / 2) - (3 * score.length())
+        // Draw text
+        AssetLoader.font.draw(batcher, "" + myWorld.getScore(), 1, 0); // (136 / 2) - (3 * score.length() - 1)
+        
         // End SpriteBatch
         batcher.end();
         
-        shapeRenderer.begin(ShapeType.Filled);
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.circle(hero.getBoundingCircle().x, hero.getBoundingCircle().y, hero.getBoundingCircle().radius);
         
-        shapeRenderer.rect(pf1.getBoundingBox().x, pf1.getBoundingBox().y, pf1.getBoundingBox().width, pf1.getBoundingBox().height);
-        shapeRenderer.rect(pf2.getBoundingBox().x, pf2.getBoundingBox().y, pf2.getBoundingBox().width, pf2.getBoundingBox().height);
-        shapeRenderer.rect(pf3.getBoundingBox().x, pf3.getBoundingBox().y, pf3.getBoundingBox().width, pf3.getBoundingBox().height);
-        shapeRenderer.rect(pf4.getBoundingBox().x, pf4.getBoundingBox().y, pf4.getBoundingBox().width, pf4.getBoundingBox().height);
-        shapeRenderer.rect(pf5.getBoundingBox().x, pf5.getBoundingBox().y, pf5.getBoundingBox().width, pf5.getBoundingBox().height);
-        shapeRenderer.rect(pf6.getBoundingBox().x, pf6.getBoundingBox().y, pf6.getBoundingBox().width, pf6.getBoundingBox().height);
         
-        shapeRenderer.end();
+        
+        // --------------------------- collision render for debug --------------------------------------//
+        
+//        shapeRenderer.begin(ShapeType.Filled);
+//        shapeRenderer.setColor(Color.RED);
+//        shapeRenderer.circle(hero.getBoundingCircle().x, hero.getBoundingCircle().y, hero.getBoundingCircle().radius);
+//        
+//        shapeRenderer.rect(pf1.getBoundingBox().x, pf1.getBoundingBox().y, pf1.getBoundingBox().width, pf1.getBoundingBox().height);
+//        shapeRenderer.rect(pf2.getBoundingBox().x, pf2.getBoundingBox().y, pf2.getBoundingBox().width, pf2.getBoundingBox().height);
+//        shapeRenderer.rect(pf3.getBoundingBox().x, pf3.getBoundingBox().y, pf3.getBoundingBox().width, pf3.getBoundingBox().height);
+//        shapeRenderer.rect(pf4.getBoundingBox().x, pf4.getBoundingBox().y, pf4.getBoundingBox().width, pf4.getBoundingBox().height);
+//        shapeRenderer.rect(pf5.getBoundingBox().x, pf5.getBoundingBox().y, pf5.getBoundingBox().width, pf5.getBoundingBox().height);
+//        shapeRenderer.rect(pf6.getBoundingBox().x, pf6.getBoundingBox().y, pf6.getBoundingBox().width, pf6.getBoundingBox().height);
+//        
+//        shapeRenderer.end();
         
     }
 }

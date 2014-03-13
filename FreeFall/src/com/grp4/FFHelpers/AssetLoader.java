@@ -1,9 +1,11 @@
 package com.grp4.FFHelpers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class AssetLoader {
@@ -13,7 +15,11 @@ public class AssetLoader {
 
     public static Animation heroAnimation;
     public static TextureRegion heroMid, heroDown, heroUp;
-
+    
+    public static BitmapFont font, shadow;
+    
+    public static Sound dead;
+    public static Sound coin;
 
     public static void load() {
 
@@ -50,12 +56,22 @@ public class AssetLoader {
 
         platform = new TextureRegion(texture, 136, 16, 22, 3);
         platform.flip(false, true);
+        
+        dead = Gdx.audio.newSound(Gdx.files.internal("data/dead.wav"));
+        coin = Gdx.audio.newSound(Gdx.files.internal("data/coin.wav"));
+        
+        font = new BitmapFont(Gdx.files.internal("data/text.fnt"));
+        font.setScale(.25f, -.25f);
+        shadow = new BitmapFont(Gdx.files.internal("data/shadow.fnt"));
+        shadow.setScale(.25f, -.25f);
 
     }
     
     public static void dispose() {
         // We must dispose of the texture when we are finished.
         texture.dispose();
+        font.dispose();
+        shadow.dispose();
     }
 
 }
