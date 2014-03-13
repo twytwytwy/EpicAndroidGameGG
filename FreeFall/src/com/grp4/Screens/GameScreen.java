@@ -33,7 +33,7 @@ public class GameScreen implements Screen {
         
         runTime = 0;
         
-		world = new GameWorld(midPointX, midPointY); // initialize world
+		world = new GameWorld(midPointX, midPointY, gameHeight); // initialize world
 		renderer = new GameRenderer(world, (int) gameHeight, midPointY); // initialize renderer
 		
 		Gdx.input.setInputProcessor(new InputHandler(world.getHero()));
@@ -44,7 +44,7 @@ public class GameScreen implements Screen {
 		runTime += delta;
 		world.update(delta); // GameWorld updates 
         renderer.render(runTime); // GameRenderer renders
-        System.out.println(1/delta); // frame rate
+        //System.out.println(1/delta); // frame rate
 	}
 
 	@Override

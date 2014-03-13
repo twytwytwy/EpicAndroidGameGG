@@ -2,6 +2,7 @@ package com.grp4.GameObject;
 
 import com.badlogic.gdx.math.Vector2;
 
+
 public class Scrollable {
 	
 	protected Vector2 position;
@@ -25,6 +26,10 @@ public class Scrollable {
         if (position.y + height < 0) {
             isScrolledUp = true;
         }
+    }
+    
+    public void stop() {
+    	velocity.y = 0;
     }
 
     // Reset: Should Override in subclass for more specific behavior.

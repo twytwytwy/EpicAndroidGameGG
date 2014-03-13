@@ -1,6 +1,7 @@
 package com.grp4.GameWorld;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -32,7 +33,7 @@ public class GameRenderer {
     private Platforms pf1, pf2, pf3, pf4, pf5, pf6;
     private Sides s1, s2, s3;
     private Background background;
-    private Fire topFire, bottomFire;
+    private Fire flames;
 
     // Game Assets
     private TextureRegion bg, platform, fire;
@@ -63,6 +64,7 @@ public class GameRenderer {
     
     private void initGameObjects() {
         hero = myWorld.getHero();
+        flames = myWorld.getFire();
         scroller = myWorld.getScroller();
         pf1 = scroller.getPf1();
         pf2 = scroller.getPf2();
@@ -74,8 +76,6 @@ public class GameRenderer {
         s2 = scroller.getS2();
         s3 = scroller.getS3();
         background = scroller.getBg();
-        topFire = new Fire(0, 0, 143, 11);
-        bottomFire = new Fire(0, gameHeight - 11, 143, 11);
     }
 
     private void initAssets() {
@@ -92,10 +92,10 @@ public class GameRenderer {
     
     private void drawFire() {
 
-        batcher.draw(fire, topFire.getX(), topFire.getY(),
-        		topFire.getWidth(), topFire.getHeight());
-        batcher.draw(fire, bottomFire.getX(), bottomFire.getY(),
-        		bottomFire.getWidth(), bottomFire.getHeight());
+        batcher.draw(fire, flames.getX(), flames.getY1(),
+        		flames.getWidth(), flames.getHeight());
+        batcher.draw(fire, flames.getX(), flames.getY2(),
+        		flames.getWidth(), flames.getHeight());
     }
     
     private void drawWalls() {
@@ -161,6 +161,19 @@ public class GameRenderer {
         
         // End SpriteBatch
         batcher.end();
+        
+        shapeRenderer.begin(ShapeType.Filled);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.circle(hero.getBoundingCircle().x, hero.getBoundingCircle().y, hero.getBoundingCircle().radius);
+        
+        shapeRenderer.rect(pf1.getBoundingBox().x, pf1.getBoundingBox().y, pf1.getBoundingBox().width, pf1.getBoundingBox().height);
+        shapeRenderer.rect(pf2.getBoundingBox().x, pf2.getBoundingBox().y, pf2.getBoundingBox().width, pf2.getBoundingBox().height);
+        shapeRenderer.rect(pf3.getBoundingBox().x, pf3.getBoundingBox().y, pf3.getBoundingBox().width, pf3.getBoundingBox().height);
+        shapeRenderer.rect(pf4.getBoundingBox().x, pf4.getBoundingBox().y, pf4.getBoundingBox().width, pf4.getBoundingBox().height);
+        shapeRenderer.rect(pf5.getBoundingBox().x, pf5.getBoundingBox().y, pf5.getBoundingBox().width, pf5.getBoundingBox().height);
+        shapeRenderer.rect(pf6.getBoundingBox().x, pf6.getBoundingBox().y, pf6.getBoundingBox().width, pf6.getBoundingBox().height);
+        
+        shapeRenderer.end();
         
     }
 }
