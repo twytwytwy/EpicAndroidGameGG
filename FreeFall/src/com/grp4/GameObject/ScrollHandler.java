@@ -15,7 +15,7 @@ public class ScrollHandler {
 	// the size of the gap between platforms
 
 	// Capital letters are used by convention when naming constants.
-	public static final int SCROLL_SPEED = -120;
+	public static final int SCROLL_SPEED = -60;
 	public static final int PLATFORM_GAP = 40;
 	public static final int SIDES_GAP = 35;
 	public static final int PLATFORM_WIDTH = 30;

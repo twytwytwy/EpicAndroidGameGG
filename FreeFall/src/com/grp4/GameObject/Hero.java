@@ -14,13 +14,16 @@ public class Hero {
 	private Circle boundingCircle;
 
 	private boolean isAlive;
+	
+	private static final int GRAVITY = 10;
+	private static final int MOVEMENT = 50;
 
 	public Hero(float x, float y, int width, int height) {
 		this.width = width;
 		this.height = height;
 		position = new Vector2(x, y);
-		velocity = new Vector2(-80, 0); // trying velocity as gravity
-		acceleration = new Vector2(0, 200); // gravity. positive Y downwards
+		velocity = new Vector2(MOVEMENT, 0); // trying velocity as gravity
+		acceleration = new Vector2(0, GRAVITY); // gravity. positive Y downwards
 
 		boundingCircle = new Circle();
 
@@ -52,9 +55,9 @@ public class Hero {
 	public void onRestart(int x, int y) {
 		position.y = y;
 		position.x = x;
-		velocity.x = -80;
+		velocity.x = MOVEMENT;
 		velocity.y = 0;
-		acceleration.y = 200;
+		acceleration.y = GRAVITY;
 		isAlive = true;
 	}
 

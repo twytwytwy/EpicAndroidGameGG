@@ -2,7 +2,7 @@ package com.grp4.FreeFall;
 
 import com.badlogic.gdx.Game;
 import com.grp4.FFHelpers.AssetLoader;
-import com.grp4.Screens.GameScreen;
+import com.grp4.Screens.SplashScreen;
 
 /**
  * FFGame is the main class initialise the entire game
@@ -21,7 +21,7 @@ public class FFGame extends Game {
 	@Override
 	public void create() {
 		AssetLoader.load();
-		setScreen(new GameScreen());
+		setScreen(new SplashScreen(this));
 	}
 	
 	@Override

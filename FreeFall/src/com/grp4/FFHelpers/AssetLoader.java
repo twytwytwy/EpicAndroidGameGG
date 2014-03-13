@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class AssetLoader {
 	
-	public static Texture texture;
-    public static TextureRegion bg, wall, skullUp, platform, fire;
+	public static Texture texture, logoTexture;
+    public static TextureRegion logo, bg, wall, skullUp, platform, fire, playButtonUp, playButtonDown;
 
     public static Animation heroAnimation;
     public static TextureRegion heroMid, heroDown, heroUp;
@@ -22,9 +22,19 @@ public class AssetLoader {
     public static Sound coin;
 
     public static void load() {
+    	
+    	logoTexture = new Texture(Gdx.files.internal("data/logo.png"));
+        logoTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+        logo = new TextureRegion(logoTexture, 0, 0, 512, 512);
 
         texture = new Texture(Gdx.files.internal("data/texture.png"));
         texture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        
+        playButtonUp = new TextureRegion(texture, 0, 83, 29, 16);
+        playButtonDown = new TextureRegion(texture, 29, 83, 29, 16);
+        playButtonUp.flip(false, true);
+        playButtonDown.flip(false, true);
 
         bg = new TextureRegion(texture, 0, 0, 136, 43);
         bg.flip(false, true);
