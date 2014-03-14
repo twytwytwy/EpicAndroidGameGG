@@ -1,7 +1,12 @@
 package com.grp4.GameWorld;
 
+import java.util.List;
+
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenEquations;
+import aurelienribon.tweenengine.TweenManager;
+
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -15,7 +20,11 @@ import com.grp4.GameObject.Hero;
 import com.grp4.GameObject.Platforms;
 import com.grp4.GameObject.ScrollHandler;
 import com.grp4.GameObject.Sides;
+import com.grp4.TweenAccessors.Value;
+import com.grp4.TweenAccessors.ValueAccessor;
+import com.grp4.ui.SimpleButton;
 import com.grp4.FFHelpers.AssetLoader;
+import com.grp4.FFHelpers.InputHandler;
 
 public class GameRenderer {
 	
@@ -24,8 +33,7 @@ public class GameRenderer {
 	private ShapeRenderer shapeRenderer;
 	private SpriteBatch batcher;
 	
-	private int midPointY;
-    private int gameHeight;
+	private int midPointY, gameHeight;
     
     // Game Objects
     private Hero hero;
@@ -40,6 +48,13 @@ public class GameRenderer {
     private Animation heroAnimation;
     private TextureRegion heroMid, heroDown, heroUp;
     private TextureRegion skullUp, wall;
+    
+    // Tween stuff
+    private TweenManager manager;
+    private Value alpha = new Value();
+
+    // Buttons
+    private List<SimpleButton> menuButtons;
 
     public GameRenderer(GameWorld world, int gameHeight, int midPointY) {
         
@@ -47,6 +62,8 @@ public class GameRenderer {
     	
     	this.gameHeight = gameHeight;
         this.midPointY = midPointY;
+        
+        this.menuButtons = ((InputHandler) Gdx.input.getInputProcessor()).getMenuButtons();
         
         cam = new OrthographicCamera();
         cam.setToOrtho(true, 136, gameHeight); // this will be the game width and height units
@@ -60,6 +77,14 @@ public class GameRenderer {
         
         initGameObjects(); // initialise all game objects and stuff
         initAssets();
+        setupTweens();
+    }
+    
+    private void setupTweens() {
+        Tween.registerAccessor(Value.class, new ValueAccessor());
+        manager = new TweenManager();
+        Tween.to(alpha, -1, .5f).target(0).ease(TweenEquations.easeOutQuad)
+                .start(manager);
     }
     
     private void initGameObjects() {
@@ -122,8 +147,35 @@ public class GameRenderer {
     	batcher.draw(platform, pf5.getX(), pf5.getY(), pf5.getWidth(), pf5.getHeight());
     	batcher.draw(platform, pf6.getX(), pf6.getY(), pf6.getWidth(), pf6.getHeight());
     }
+    
+    private void drawHero(float runTime) {
+    	
+    	// Draw hero at its coordinates. Retrieve the Animation object from AssetLoader
+        // Pass in the runTime variable to get the current frame.
+    	batcher.draw(heroAnimation.getKeyFrame(runTime),
+                hero.getX(), hero.getY(), hero.getWidth(), hero.getHeight());
+    }
+    
+    private void drawMenuUI() {
+    	AssetLoader.shadow.draw(batcher, "FreeFall", (136 / 2) - (35), 76);
+    	AssetLoader.font.draw(batcher, "FreeFall", (136 / 2) - (35 - 1), 75);
 
-	public void render(float runTime) {
+        for (SimpleButton button : menuButtons) {
+            button.draw(batcher);
+        }
+    }
+    
+    private void drawScore() {
+    	 // Convert integer into String
+        String score = myWorld.getScore() + "";
+
+        // Draw shadow first
+        AssetLoader.shadow.draw(batcher, score, 13, 14); //(136 / 2) - (3 * score.length())
+        // Draw text
+        AssetLoader.font.draw(batcher, score, 14, 13); // (136 / 2) - (3 * score.length() - 1)
+    }
+
+	public void render(float delta, float runTime) {
 
         // Fill the entire screen with black, to prevent potential flickering.
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -145,49 +197,43 @@ public class GameRenderer {
         // This is good for performance when drawing images that do not require
         // transparency.
         batcher.disableBlending();
+        
+        //background. only draw when we have found an appropriate one
         //batcher.draw(bg, background.getX(), background.getY(), 136, 100);
         
         drawPlatforms();
-        drawWalls();
         drawFire();
-
+        drawWalls();
+        
+        
         // The hero needs transparency, so we enable that again.
         batcher.enableBlending();
         
-        // Draw hero at its coordinates. Retrieve the Animation object from AssetLoader
-        // Pass in the runTime variable to get the current frame.
-        batcher.draw(heroAnimation.getKeyFrame(runTime),
-                hero.getX(), hero.getY(), hero.getWidth(), hero.getHeight());
-        
-        
-        
-        if (myWorld.isReady()) {
-            // Draw shadow first
-            AssetLoader.shadow.draw(batcher, "Touch me", (136 / 2)
-                    - (42), 76);
-            // Draw text
-            AssetLoader.font.draw(batcher, "Touch me", (136 / 2)
-                    - (42 - 1), 75);
+        if (myWorld.isRunning()) {
+        	drawHero(runTime);
+        	drawScore();
+        	
+        } else if (myWorld.isReady()) {
+            AssetLoader.shadow.draw(batcher, "Touch me", (136 / 2)- (42), 76);
+            AssetLoader.font.draw(batcher, "Touch me", (136 / 2)- (42 - 1), 75);
+            drawScore();
+            
+        } else if (myWorld.isMenu()) {
+        	drawMenuUI();
+        	
         } else if (myWorld.isGameOver()) {
-                AssetLoader.shadow.draw(batcher, "Game Over", 25, 56);
-                AssetLoader.font.draw(batcher, "Game Over", 24, 55);
-                
-                AssetLoader.shadow.draw(batcher, "Try again?", 23, 76);
-                AssetLoader.font.draw(batcher, "Try again?", 24, 75);
+        	AssetLoader.shadow.draw(batcher, "Game Over", 25, 56);
+            AssetLoader.font.draw(batcher, "Game Over", 24, 55);      
+            AssetLoader.shadow.draw(batcher, "Try again?", 23, 76);
+            AssetLoader.font.draw(batcher, "Try again?", 24, 75);
+            
+            drawScore();
+            drawHero(runTime);
         }
-        
-        
-        // Convert integer into String
-        String score = myWorld.getScore() + "";
-
-        // Draw shadow first
-        AssetLoader.shadow.draw(batcher, "" + myWorld.getScore(), 0, 1); //(136 / 2) - (3 * score.length())
-        // Draw text
-        AssetLoader.font.draw(batcher, "" + myWorld.getScore(), 1, 0); // (136 / 2) - (3 * score.length() - 1)
         
         // End SpriteBatch
         batcher.end();
-        
+        drawTransition(delta);
         
         
         
@@ -206,5 +252,19 @@ public class GameRenderer {
 //        
 //        shapeRenderer.end();
         
+    }
+	
+	private void drawTransition(float delta) {
+        if (alpha.getValue() > 0) {
+            manager.update(delta);
+            Gdx.gl.glEnable(GL10.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.begin(ShapeType.Filled);
+            shapeRenderer.setColor(1, 1, 1, alpha.getValue());
+            shapeRenderer.rect(0, 0, 136, 300);
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL10.GL_BLEND);
+
+        }
     }
 }

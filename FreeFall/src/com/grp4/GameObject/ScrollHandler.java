@@ -52,6 +52,28 @@ public class ScrollHandler {
 
 		platforms = new Platforms[] { pf1, pf2, pf3, pf4, pf5, pf6 };
 	}
+	
+	public void updateReady(float delta) {
+
+		s1.update(delta);
+		s2.update(delta);
+		s3.update(delta);
+		
+		bg.update(delta);
+		
+		if (s1.isScrolledUp()) {
+			s1.reset(s3.getTailY() + SIDES_GAP);
+		} else if (s2.isScrolledUp()) {
+			s2.reset(s1.getTailY() + SIDES_GAP);
+		} else if (s3.isScrolledUp()) {
+			s3.reset(s2.getTailY() + SIDES_GAP);
+		}
+		
+		if (bg.isScrolledUp) {
+			bg.reset(midPointY * 2);
+		}
+
+    }
 
 	public void update(float delta) {
 		// Update our objects;

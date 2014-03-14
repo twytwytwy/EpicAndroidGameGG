@@ -34,16 +34,15 @@ public class GameScreen implements Screen {
         runTime = 0;
         
 		world = new GameWorld(midPointY, gameHeight, midPointX); // initialize world
+		Gdx.input.setInputProcessor(new InputHandler(world, screenWidth / gameWidth, screenHeight / gameHeight));
 		renderer = new GameRenderer(world, (int) gameHeight, midPointY); // initialize renderer
-		
-		Gdx.input.setInputProcessor(new InputHandler(world));
 	}
 
 	@Override
 	public void render(float delta) { // delta is the delay between each call to render() its built into libGDX
 		runTime += delta;
 		world.update(delta); // GameWorld updates 
-        renderer.render(runTime); // GameRenderer renders
+        renderer.render(delta, runTime); // GameRenderer renders
         //System.out.println(1/delta); // frame rate
 	}
 

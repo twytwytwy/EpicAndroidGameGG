@@ -1,38 +1,105 @@
 package com.grp4.FFHelpers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.grp4.GameObject.Hero;
 import com.grp4.GameWorld.GameWorld;
+import com.grp4.ui.SimpleButton;
 
 public class InputHandler implements InputProcessor {
-	
+
 	private GameWorld myWorld;
 	private Hero hero;
-	
-	public InputHandler(GameWorld myWorld) {
+
+	private List<SimpleButton> menuButtons;
+
+	private SimpleButton playButton;
+
+	private float scaleFactorX;
+	private float scaleFactorY;
+
+	public InputHandler(GameWorld myWorld, float scaleFactorX,
+			float scaleFactorY) {
 		this.myWorld = myWorld;
 		this.hero = myWorld.getHero();
+
+		int midPointY = myWorld.getMidPointY();
+		int midPointX = myWorld.getMidPointX();
+
+		this.scaleFactorX = scaleFactorX;
+		this.scaleFactorY = scaleFactorY;
+
+		menuButtons = new ArrayList<SimpleButton>();
+		playButton = new SimpleButton(midPointX
+				- (AssetLoader.playButtonUp.getRegionWidth() / 2),
+				midPointY + 50, 29, 16, AssetLoader.playButtonUp,
+				AssetLoader.playButtonDown);
+		menuButtons.add(playButton);
 	}
-	
+
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		if (myWorld.isReady()) {
-            myWorld.start();
-        }
+		screenX = scaleX(screenX);
+		screenY = scaleY(screenY);
+		System.out.println(screenX + " " + screenY);
 
-        hero.onClick();
+		if (myWorld.isMenu()) {
+			playButton.isTouchDown(screenX, screenY); // if clicked on the
+														// button, isPressed =
+														// true
+		} else if (myWorld.isReady()) {
+			myWorld.start();
+		}
 
-        if (myWorld.isGameOver()) {
-            myWorld.restart();
-        }
+		hero.onClick();
 
-        return true;
+		if (myWorld.isGameOver()) {
+			myWorld.restart();
+		}
+
+		return true;
 	}
 
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		screenX = scaleX(screenX);
+		screenY = scaleY(screenY);
+
+		if (myWorld.isMenu()) {
+			if (playButton.isTouchUp(screenX, screenY)) { // will only return
+															// true if isPressed
+															// = true
+				myWorld.ready();
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	@Override
-	public boolean keyDown(int keycode) {
-		// TODO Auto-generated method stub
+	public boolean keyDown(int keycode) { // for desktop debugging purposes
+
+		// Can now use Space Bar to play the game
+		if (keycode == Keys.SPACE) {
+
+			if (myWorld.isMenu()) {
+				myWorld.ready();
+			} else if (myWorld.isReady()) {
+				myWorld.start();
+			}
+
+			hero.onClick();
+
+			if (myWorld.isGameOver()) {
+				myWorld.restart();
+			}
+
+		}
+
 		return false;
 	}
 
@@ -44,12 +111,6 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean keyTyped(char character) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -70,6 +131,18 @@ public class InputHandler implements InputProcessor {
 	public boolean scrolled(int amount) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	private int scaleX(int screenX) {
+		return (int) (screenX / scaleFactorX);
+	}
+
+	private int scaleY(int screenY) {
+		return (int) (screenY / scaleFactorY);
+	}
+
+	public List<SimpleButton> getMenuButtons() {
+		return menuButtons;
 	}
 
 }

@@ -4,13 +4,11 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Hero {
-	private Vector2 position;
-	private Vector2 velocity;
-	private Vector2 acceleration;
+	private Vector2 position, velocity, acceleration;
 
-	private int width;
-	private int height;
-
+	private int width, height;
+	private float originalX, originalY;
+	
 	private Circle boundingCircle;
 
 	private boolean isAlive;
@@ -21,6 +19,8 @@ public class Hero {
 	public Hero(float x, float y, int width, int height) {
 		this.width = width;
 		this.height = height;
+		this.originalY = y;
+		this.originalX = x;
 		position = new Vector2(x, y);
 		velocity = new Vector2(MOVEMENT, 0); // trying velocity as gravity
 		acceleration = new Vector2(0, GRAVITY); // gravity. positive Y downwards
@@ -44,6 +44,10 @@ public class Hero {
 		boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
 
 	}
+	
+	public void updateReady(float runTime) {
+        position.y = 2 * (float) Math.sin(7 * runTime) + originalY;
+    }
 
 	public void die() {
 		isAlive = false;
@@ -52,9 +56,9 @@ public class Hero {
 		acceleration.y = 200;
 	}
 	
-	public void onRestart(int x, int y) {
-		position.y = y;
-		position.x = x;
+	public void onRestart() {
+		position.y = originalY;
+		position.x = originalX;
 		velocity.x = MOVEMENT;
 		velocity.y = 0;
 		acceleration.y = GRAVITY;
