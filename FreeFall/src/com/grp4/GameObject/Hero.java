@@ -13,8 +13,8 @@ public class Hero {
 
 	private boolean isAlive;
 	
-	private static final int GRAVITY = 10;
-	private static final int MOVEMENT = 50;
+	private static final int GRAVITY = 50;
+	private static final int MOVEMENT = 80;
 
 	public Hero(float x, float y, int width, int height) {
 		this.width = width;
