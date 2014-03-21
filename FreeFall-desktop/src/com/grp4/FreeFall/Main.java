@@ -9,7 +9,7 @@ public class Main {
 		cfg.title = "FreeFall";
 		cfg.useGL20 = false;
 		cfg.width = 272;
-		cfg.height = 480;
+		cfg.height = 408;
 		
 		new LwjglApplication(new FFGame(), cfg);
 	}

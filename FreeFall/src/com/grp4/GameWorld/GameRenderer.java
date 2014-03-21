@@ -33,20 +33,20 @@ public class GameRenderer {
 	private ShapeRenderer shapeRenderer;
 	private SpriteBatch batcher;
 	
-	private int midPointY, gameHeight;
+	private int gameHeight, gameWidth;
     
     // Game Objects
     private Hero hero;
     private ScrollHandler scroller;
     private Platforms pf1, pf2, pf3, pf4, pf5, pf6;
     private Sides s1, s2, s3;
-    private Background background;
+    //private Background background;
     private Fire flames;
 
     // Game Assets
     private TextureRegion bg, platform, fire;
     private Animation heroAnimation;
-    private TextureRegion heroMid, heroDown, heroUp;
+    //private TextureRegion heroMid, heroDown, heroUp;
     private TextureRegion skullUp, wall;
     
     // Tween stuff
@@ -56,12 +56,12 @@ public class GameRenderer {
     // Buttons
     private List<SimpleButton> menuButtons;
 
-    public GameRenderer(GameWorld world, int gameHeight, int midPointY) {
+    public GameRenderer(GameWorld world, int gameHeight, int gameWidth) {
         
     	myWorld = world;
     	
     	this.gameHeight = gameHeight;
-        this.midPointY = midPointY;
+        this.gameWidth = gameWidth;
         
         this.menuButtons = ((InputHandler) Gdx.input.getInputProcessor()).getMenuButtons();
         
@@ -100,15 +100,15 @@ public class GameRenderer {
         s1 = scroller.getS1();
         s2 = scroller.getS2();
         s3 = scroller.getS3();
-        background = scroller.getBg();
+//        background = scroller.getBg();
     }
 
     private void initAssets() {
         bg = AssetLoader.bg;
         heroAnimation = AssetLoader.heroAnimation;
-        heroMid = AssetLoader.heroMid;
-        heroDown = AssetLoader.heroDown;
-        heroUp = AssetLoader.heroUp;
+//        heroMid = AssetLoader.heroMid;
+//        heroDown = AssetLoader.heroDown;
+//        heroUp = AssetLoader.heroUp;
         skullUp = AssetLoader.skullUp;
         wall = AssetLoader.wall;
         fire = AssetLoader.fire;
@@ -126,13 +126,13 @@ public class GameRenderer {
     private void drawWalls() {
     	
     	// left wall
-        batcher.draw(wall, -1, 0, 13, gameHeight);
+        batcher.draw(wall, hero.getLeftBound()-13, 0, 13, gameHeight);
         batcher.draw(skullUp, s1.getX(), s1.getY(), s1.getWidth(), s1.getHeight());
         batcher.draw(skullUp, s2.getX(), s2.getY(), s2.getWidth(), s2.getHeight());
         batcher.draw(skullUp, s3.getX(), s3.getY(), s3.getWidth(), s3.getHeight());
         
         // right wall
-        batcher.draw(wall, 124, 0, 13, gameHeight);
+        batcher.draw(wall, hero.getRightBound() + 17, 0, 13, gameHeight);
         batcher.draw(skullUp, 124, s1.getY(), s1.getWidth(), s1.getHeight());
         batcher.draw(skullUp, 124, s2.getY(), s2.getWidth(), s2.getHeight());
         batcher.draw(skullUp, 124, s3.getY(), s3.getWidth(), s3.getHeight());

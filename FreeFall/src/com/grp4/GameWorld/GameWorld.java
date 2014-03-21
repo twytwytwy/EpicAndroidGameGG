@@ -6,6 +6,16 @@ import com.grp4.GameObject.Fire;
 import com.grp4.GameObject.Hero;
 import com.grp4.GameObject.ScrollHandler;
 
+/**
+ * This class stores data of the game world
+ * such as game state, scores, runtime.
+ * 
+ * Cascading updates all objects in the game
+ * Invoke collision detection of various game objects
+ * 
+ * @author Wei Yang
+ *
+ */
 public class GameWorld {
 
 	private Hero hero;
@@ -19,8 +29,7 @@ public class GameWorld {
 
 	private float runTime = 0;
 
-	private int midPointY;
-	private int midPointX;
+	private int midPointY, midPointX;
 
 	private GameState currentState;
 
@@ -28,10 +37,11 @@ public class GameWorld {
 		MENU, READY, RUNNING, GAMEOVER
 	}
 
-	public GameWorld(int midPointY, float gameHeight, int midPointX) {
+	public GameWorld(float gameWidth, float gameHeight) {
 		currentState = GameState.MENU;
-		this.midPointY = midPointY;
-		this.midPointX = midPointX;
+		this.midPointX = (int) gameWidth / 2;
+		this.midPointY = (int) gameHeight / 2;
+		
 		hero = new Hero(midPointX - 10, midPointY - 20, 17, 12);
 		scroller = new ScrollHandler(this, midPointY);
 		fire = new Fire(0, 0, gameHeight - 11, 143, 11);
@@ -59,7 +69,8 @@ public class GameWorld {
 	}
 
 	public void updateRunning(float delta) {
-
+		
+		// delta correction of game data
 		if (delta > .15f) {
 			delta = .15f;
 		}
@@ -67,9 +78,12 @@ public class GameWorld {
 		hero.update(delta);
 		scroller.update(delta);
 
+		// collision detection for hero and platforms
 		if (hero.isAlive()) {
 			scroller.collides(hero);
 		}
+		
+		// collision detection for hero and fire
 		if (fire.collides(hero) && hero.isAlive()) {
 			scroller.stop();
 			hero.die();
@@ -111,8 +125,7 @@ public class GameWorld {
 		score += increment;
 	}
 
-	// ------------------------- game states methods
-	// --------------------------//
+	// ------------------------- game states methods --------------------------//
 
 	public void ready() {
 		currentState = GameState.READY;

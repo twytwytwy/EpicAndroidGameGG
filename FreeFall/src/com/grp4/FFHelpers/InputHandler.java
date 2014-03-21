@@ -9,6 +9,13 @@ import com.grp4.GameObject.Hero;
 import com.grp4.GameWorld.GameWorld;
 import com.grp4.ui.SimpleButton;
 
+/**
+ * This class handles touch input during game play and will run on a separate thread
+ * Scales the input co-ordinates to the game co-ordinates
+ * 
+ * @author Wei Yang
+ *
+ */
 public class InputHandler implements InputProcessor {
 
 	private GameWorld myWorld;

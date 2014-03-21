@@ -7,10 +7,14 @@ import com.grp4.GameWorld.GameRenderer;
 import com.grp4.GameWorld.GameWorld;
 
 /**
- * GameScreen class takes care of the display that users will see
+ * this is the screen for the main gameplay
  * 
- * render() method will be called at the fps rate therefore it
- * is the Game Loop. Use it to update game data and render image
+ * Methods:
+ * constructor - creates the GameWorld and GameRenderer object
+ * render() - called by the game at a rate of fps
+ * 		takes in delta, delay time, given by the game framework
+ * 		updates gameWorld and render GameRenderer
+ * 		increment runTime by delta
  * 
  * @author Wei Yang
  *
@@ -23,19 +27,23 @@ public class GameScreen implements Screen {
 	private float runTime; // determines which frame in animation
 	
 	public GameScreen() {
+		// fix the display width and set the display height
 		float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();      
-        float gameWidth = 136;
-        float gameHeight = screenHeight / (screenWidth / gameWidth);
-        
-        int midPointX = (int) (gameWidth / 2);
-        int midPointY = (int) (gameHeight / 2);
+        float screenHeight = Gdx.graphics.getHeight();
+        System.out.println(screenWidth + "   " + screenHeight);
+        // float gameWidth = 136;
+        // float gameHeight = screenHeight / (screenWidth / gameWidth);
+        	
+		float gameWidth = 136;
+		float gameHeight = 226;
+        //int midPointX = (int) (gameWidth / 2);
+        //int midPointY = (int) (gameHeight / 2);
         
         runTime = 0;
         
-		world = new GameWorld(midPointY, gameHeight, midPointX); // initialize world
+		world = new GameWorld(gameWidth, gameHeight); // initialize world
 		Gdx.input.setInputProcessor(new InputHandler(world, screenWidth / gameWidth, screenHeight / gameHeight));
-		renderer = new GameRenderer(world, (int) gameHeight, midPointY); // initialize renderer
+		renderer = new GameRenderer(world, (int) gameHeight, (int) gameWidth); // initialize renderer
 	}
 
 	@Override

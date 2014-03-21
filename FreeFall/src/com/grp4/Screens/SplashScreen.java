@@ -15,6 +15,14 @@ import com.grp4.FFHelpers.AssetLoader;
 import com.grp4.FreeFall.FFGame;
 import com.grp4.TweenAccessors.SpriteAccessor;
 
+/**
+ * This screen handles the welcoming screen of the game
+ * it is not important to the game mechanics and serves no purposes
+ * so no need to understand. Just for us to feel shiok
+ * 
+ * @author Wei Yang
+ *
+ */
 public class SplashScreen implements Screen {
 	
 	private TweenManager manager;
@@ -26,6 +34,7 @@ public class SplashScreen implements Screen {
         this.game = game;
     }
 
+    
     @Override
     public void show() {
         sprite = new Sprite(AssetLoader.logo);
@@ -52,6 +61,8 @@ public class SplashScreen implements Screen {
         
         // TweenCallback objects will have their method called when tweening is done
         TweenCallback cb = new TweenCallback() {
+        	
+        	// will set the current game screen to GameScreen object
             @Override
             public void onEvent(int type, BaseTween<?> source) {
                 game.setScreen(new GameScreen());

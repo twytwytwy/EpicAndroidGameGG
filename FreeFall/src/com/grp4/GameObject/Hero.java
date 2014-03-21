@@ -15,6 +15,8 @@ public class Hero {
 	
 	private static final int GRAVITY = 50;
 	private static final int MOVEMENT = 80;
+	private int leftBound = 12;
+	private int rightBound = 107;
 
 	public Hero(float x, float y, int width, int height) {
 		this.width = width;
@@ -34,10 +36,10 @@ public class Hero {
 
 		velocity.add(acceleration.cpy().scl(delta));
 
-		if (position.x < 12) {
-			position.x = 12;
-		} else if (position.x > 107) {
-			position.x = 107;
+		if (position.x < leftBound) {
+			position.x = leftBound;
+		} else if (position.x > rightBound) {
+			position.x = rightBound;
 		}
 
 		position.add(velocity.cpy().scl(delta));
@@ -89,6 +91,14 @@ public class Hero {
 
 	public Circle getBoundingCircle() {
 		return boundingCircle;
+	}
+	
+	public int getLeftBound() {
+		return leftBound;
+	}
+	
+	public int getRightBound() {
+		return rightBound;
 	}
 
 	public boolean isAlive() {
