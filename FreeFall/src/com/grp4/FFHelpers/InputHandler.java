@@ -27,11 +27,15 @@ public class InputHandler implements InputProcessor {
 
 	private float scaleFactorX;
 	private float scaleFactorY;
+	
+	private ClientThread clientThread;
 
-	public InputHandler(GameWorld myWorld, float scaleFactorX,
+	public InputHandler(GameWorld myWorld, ClientThread clientThread, float scaleFactorX,
 			float scaleFactorY) {
 		this.myWorld = myWorld;
 		this.hero = myWorld.getHero();
+		
+		this.clientThread = clientThread;
 
 		int midPointY = myWorld.getMidPointY();
 		int midPointX = myWorld.getMidPointX();
@@ -49,41 +53,44 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		screenX = scaleX(screenX);
-		screenY = scaleY(screenY);
-		System.out.println(screenX + " " + screenY);
-
-		if (myWorld.isMenu()) {
-			playButton.isTouchDown(screenX, screenY); // if clicked on the
-														// button, isPressed =
-														// true
-		} else if (myWorld.isReady()) {
-			myWorld.start();
+		if (myWorld.isReady()) {
+			clientThread.sendMessage();
 		}
-
-		hero.onClick();
-
-		if (myWorld.isGameOver()) {
-			myWorld.restart();
-		}
+//		screenX = scaleX(screenX);
+//		screenY = scaleY(screenY);
+//		System.out.println(screenX + " " + screenY);
+//
+//		if (myWorld.isMenu()) {
+//			playButton.isTouchDown(screenX, screenY); // if clicked on the
+//														// button, isPressed =
+//														// true
+//		} else if (myWorld.isReady()) {
+//			myWorld.start();
+//		}
+//
+//		hero.onClick();
+//
+//		if (myWorld.isGameOver()) {
+//			myWorld.restart();
+//		}
 
 		return true;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		screenX = scaleX(screenX);
-		screenY = scaleY(screenY);
-
-		if (myWorld.isMenu()) {
-			if (playButton.isTouchUp(screenX, screenY)) { // will only return
-															// true if isPressed
-															// = true
-				myWorld.ready();
-				return true;
-			}
-		}
-
+//		screenX = scaleX(screenX);
+//		screenY = scaleY(screenY);
+//
+//		if (myWorld.isMenu()) {
+//			if (playButton.isTouchUp(screenX, screenY)) { // will only return
+//															// true if isPressed
+//															// = true
+//				myWorld.ready();
+//				return true;
+//			}
+//		}
+//
 		return false;
 	}
 
@@ -91,21 +98,21 @@ public class InputHandler implements InputProcessor {
 	public boolean keyDown(int keycode) { // for desktop debugging purposes
 
 		// Can now use Space Bar to play the game
-		if (keycode == Keys.SPACE) {
-
-			if (myWorld.isMenu()) {
-				myWorld.ready();
-			} else if (myWorld.isReady()) {
-				myWorld.start();
-			}
-
-			hero.onClick();
-
-			if (myWorld.isGameOver()) {
-				myWorld.restart();
-			}
-
-		}
+//		if (keycode == Keys.SPACE) {
+//
+//			if (myWorld.isMenu()) {
+//				myWorld.ready();
+//			} else if (myWorld.isReady()) {
+//				myWorld.start();
+//			}
+//
+//			hero.onClick();
+//
+//			if (myWorld.isGameOver()) {
+//				myWorld.restart();
+//			}
+//
+//		}
 
 		return false;
 	}

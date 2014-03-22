@@ -2,6 +2,7 @@ package com.grp4.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.grp4.FFHelpers.ClientThread;
 import com.grp4.FFHelpers.InputHandler;
 import com.grp4.GameWorld.GameRenderer;
 import com.grp4.GameWorld.GameWorld;
@@ -23,6 +24,7 @@ public class GameScreen implements Screen {
 	
 	private GameWorld world;
 	private GameRenderer renderer;
+	private ClientThread clientThread;
 	
 	private float runTime; // determines which frame in animation
 	
@@ -42,8 +44,12 @@ public class GameScreen implements Screen {
         runTime = 0;
         
 		world = new GameWorld(gameWidth, gameHeight); // initialize world
-		Gdx.input.setInputProcessor(new InputHandler(world, screenWidth / gameWidth, screenHeight / gameHeight));
+		clientThread = new ClientThread(world);
+		clientThread.start();
+		
+		Gdx.input.setInputProcessor(new InputHandler(world, clientThread, screenWidth / gameWidth, screenHeight / gameHeight));
 		renderer = new GameRenderer(world, (int) gameHeight, (int) gameWidth); // initialize renderer
+		
 	}
 
 	@Override
