@@ -1,8 +1,14 @@
 package com.grp4.Screens;
 
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.concurrent.CyclicBarrier;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.grp4.FFHelpers.ClientThread;
+import com.grp4.FFHelpers.ClientThreadReceiver;
+import com.grp4.FFHelpers.ClientThreadSender;
 import com.grp4.FFHelpers.InputHandler;
 import com.grp4.GameWorld.GameRenderer;
 import com.grp4.GameWorld.GameWorld;
@@ -24,7 +30,15 @@ public class GameScreen implements Screen {
 	
 	private GameWorld world;
 	private GameRenderer renderer;
-	private ClientThread clientThread;
+	
+	private Socket hostSocket;
+	private PrintWriter hostWriter;
+	private BufferedReader hostReader;
+	
+	private ClientThreadSender clientSender;
+	private ClientThreadReceiver clientReceiver;
+	
+	private CyclicBarrier cb;
 	
 	private float runTime; // determines which frame in animation
 	
@@ -32,7 +46,7 @@ public class GameScreen implements Screen {
 		// fix the display width and set the display height
 		float screenWidth = Gdx.graphics.getWidth();
         float screenHeight = Gdx.graphics.getHeight();
-        System.out.println(screenWidth + "   " + screenHeight);
+        //System.out.println(screenWidth + "   " + screenHeight);
         // float gameWidth = 136;
         // float gameHeight = screenHeight / (screenWidth / gameWidth);
         	
@@ -44,12 +58,15 @@ public class GameScreen implements Screen {
         runTime = 0;
         
 		world = new GameWorld(gameWidth, gameHeight); // initialize world
-		clientThread = new ClientThread(world);
-		clientThread.start();
 		
-		Gdx.input.setInputProcessor(new InputHandler(world, clientThread, screenWidth / gameWidth, screenHeight / gameHeight));
+		cb = new CyclicBarrier(2);
+		clientSender = new ClientThreadSender(this, cb, world);
+		clientReceiver = new ClientThreadReceiver(this, cb, world);
+		clientSender.start();
+		clientReceiver.start();
+		
+		Gdx.input.setInputProcessor(new InputHandler(world, clientSender, screenWidth / gameWidth, screenHeight / gameHeight));
 		renderer = new GameRenderer(world, (int) gameHeight, (int) gameWidth); // initialize renderer
-		
 	}
 
 	@Override
@@ -92,9 +109,46 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
+		hostWriter.close();
 		
+		clientSender.interrupt();
+		clientReceiver.interrupt();
+		
+		try {
+			hostReader.close();
+			hostSocket.close();
+			
+			clientSender.join();
+			clientReceiver.join();
+		} catch (Exception e) {
+			System.err.println("GameScreen dispose failed!");
+			e.printStackTrace();
+		}
 	}
 	
-	
+	// -------- getters setters for sockets, readers, writers -------- //
+
+	public Socket getHostSocket() {
+		return hostSocket;
+	}
+
+	public void setHostSocket(Socket hostSocket) {
+		this.hostSocket = hostSocket;
+	}
+
+	public PrintWriter getHostWriter() {
+		return hostWriter;
+	}
+
+	public void setHostWriter(PrintWriter hostWriter) {
+		this.hostWriter = hostWriter;
+	}
+
+	public BufferedReader getHostReader() {
+		return hostReader;
+	}
+
+	public void setHostReader(BufferedReader hostReader) {
+		this.hostReader = hostReader;
+	}
 }

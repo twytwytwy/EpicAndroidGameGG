@@ -65,6 +65,8 @@ public class ScrollHandler {
 		} else if (pf6.isScrolledUp()) {
 			pf6.reset(pf5.getTailY() + PLATFORM_GAP);
 		}
+		
+		
 	}
 
 	public void stop() {
@@ -113,5 +115,14 @@ public class ScrollHandler {
 
 	public Platforms getPf6() {
 		return pf6;
+	}
+	
+	public String getCoordinates() {
+		String coordinates = "";
+		for (Platforms i : platforms) {
+			coordinates += (int) (i.getX() + 100);
+			coordinates += (int) (i.getY() + 100);
+		}
+		return coordinates;
 	}
 }

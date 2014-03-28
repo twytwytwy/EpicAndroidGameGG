@@ -29,9 +29,13 @@ public class GameWorld {
 
 	private float runTime = 0;
 
-	private int midPointY, midPointX;
+	private int midPointY, midPointX, hX, hY;
+	
+	private int[] platformsCoords;
 
 	private GameState currentState;
+	
+	private String message;
 
 	public enum GameState {
 		MENU, READY, RUNNING, GAMEOVER
@@ -45,27 +49,49 @@ public class GameWorld {
 		hero = new Hero(midPointX - 10, midPointY - 20, 17, 12);
 		scroller = new ScrollHandler(this, midPointY);
 		fire = new Fire(0, 0, gameHeight - 11, 143, 11);
+		
+		String startPt = "" + (midPointX + 100) + (midPointY + 100);
+		setMessage(startPt);
+		platformsCoords = new int[12];
 	}
+	
+	// ------------------------- update methods --------------------------//
 
 	public void update(float delta) {
 		runTime += delta;
+		
+		updateReady(delta);
 
-		switch (currentState) {
-		case READY:
-		case MENU:
-			updateReady(delta);
-			break;
-
-		case RUNNING:
-		default:
-			updateRunning(delta);
-			break;
-		}
+//		switch (currentState) {
+//		case READY:
+//		case MENU:
+//			updateReady(delta);
+//			break;
+//
+//		case RUNNING:
+//		default:
+//			updateRunning(delta);
+//			break;
+//		}
 	}
 
 	public void updateReady(float delta) {
-		hero.updateReady(runTime);
-		scroller.updateReady(delta);
+		//hero.updateReady(runTime);
+		//scroller.updateReady(delta);
+		String command = getMessage();
+		if (command.length() == 2) {
+			currentState = GameState.GAMEOVER;
+		} else if (command.length() == 5) {
+			currentState = GameState.READY;
+		} else if (command.length() == 42){
+			currentState = GameState.RUNNING;
+			hX = Integer.parseInt(command.substring(0, 3)) - 100;
+			hY = Integer.parseInt(command.substring(3, 6)) - 100;
+			for (int i = 0; i < 12; i ++) {
+				int j = 6 + 3*i;
+				platformsCoords[i] = Integer.parseInt(command.substring(j, j+3)) - 100;
+			}	
+		}
 	}
 
 	public void updateRunning(float delta) {
@@ -93,6 +119,28 @@ public class GameWorld {
 
 	}
 
+	// ------------------------- game objects methods --------------------------//
+	
+	public int getHX() {
+		return hX;
+	}
+	
+	public int getHY() {
+		return hY;
+	}
+	
+	public int getPFC(int i) {
+		return platformsCoords[i];
+	}
+	
+	public synchronized void setMessage(String text) {
+		message = text;
+	}
+	
+	public synchronized String getMessage() {
+		return message;
+	}
+	
 	public Hero getHero() {
 		return hero;
 	}

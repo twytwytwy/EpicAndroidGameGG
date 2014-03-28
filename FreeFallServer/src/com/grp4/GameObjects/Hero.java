@@ -17,6 +17,8 @@ public class Hero {
 	private static final int MOVEMENT = 80;
 	private int leftBound = 12;
 	private int rightBound = 107;
+	
+	//private String coordinates;
 
 	public Hero(float x, float y, int width, int height) {
 		this.width = width;
@@ -32,8 +34,7 @@ public class Hero {
 		isAlive = true;
 	}
 
-	public void update(float delta) {
-
+	public synchronized void update(float delta) {
 		velocity.add(acceleration.cpy().scl(delta));
 
 		if (position.x < leftBound) {
@@ -44,21 +45,20 @@ public class Hero {
 
 		position.add(velocity.cpy().scl(delta));
 		boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
-
 	}
 	
 	public void updateReady(float runTime) {
         position.y = 2 * (float) Math.sin(7 * runTime) + originalY;
     }
 
-	public void die() {
+	public synchronized void die() {
 		isAlive = false;
 		velocity.x = 0;
 		velocity.y = -100;
 		acceleration.y = 200;
 	}
 	
-	public void onRestart() {
+	public synchronized void onRestart() {
 		position.y = originalY;
 		position.x = originalX;
 		velocity.x = MOVEMENT;
@@ -67,7 +67,7 @@ public class Hero {
 		isAlive = true;
 	}
 
-	public void onClick() {
+	public synchronized void onClick() {
 		if (isAlive) {
 			velocity.x *= -1;
 		}
@@ -105,10 +105,17 @@ public class Hero {
 		return isAlive;
 	}
 
-	public void setParams(float y) {
+	public synchronized void setParams(float y) {
 		position.y = y - height;
 		boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
 		velocity.y = 0;
+	}
+	
+	public String getCoordinates() {
+		String coordinates = "";
+		coordinates += (int) (position.x + 100);
+		coordinates += (int) (position.y + 100);
+		return coordinates;
 	}
 
 }

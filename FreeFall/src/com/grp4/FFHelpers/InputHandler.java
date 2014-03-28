@@ -8,6 +8,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.grp4.GameObject.Hero;
 import com.grp4.GameWorld.GameWorld;
 import com.grp4.ui.SimpleButton;
+import com.grp4.FFHelpers.ClientThreadSender;
 
 /**
  * This class handles touch input during game play and will run on a separate thread
@@ -28,14 +29,14 @@ public class InputHandler implements InputProcessor {
 	private float scaleFactorX;
 	private float scaleFactorY;
 	
-	private ClientThread clientThread;
+	private ClientThreadSender clientSender;
 
-	public InputHandler(GameWorld myWorld, ClientThread clientThread, float scaleFactorX,
+	public InputHandler(GameWorld myWorld, ClientThreadSender clientSender, float scaleFactorX,
 			float scaleFactorY) {
 		this.myWorld = myWorld;
 		this.hero = myWorld.getHero();
 		
-		this.clientThread = clientThread;
+		this.clientSender = clientSender;
 
 		int midPointY = myWorld.getMidPointY();
 		int midPointX = myWorld.getMidPointX();
@@ -54,8 +55,14 @@ public class InputHandler implements InputProcessor {
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		if (myWorld.isReady()) {
-			clientThread.sendMessage();
+			clientSender.setTouch();
+			//System.err.println("input handler touched");
+		} else if (myWorld.isGameOver()) {
+			clientSender.setTouch();
+		} else if (myWorld.isRunning()) {
+			clientSender.setTouch();
 		}
+		
 //		screenX = scaleX(screenX);
 //		screenY = scaleY(screenY);
 //		System.out.println(screenX + " " + screenY);

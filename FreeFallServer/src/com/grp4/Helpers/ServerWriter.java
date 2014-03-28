@@ -7,32 +7,34 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CyclicBarrier;
 
-import com.grp4.GameObjects.Hero;
 import com.grp4.GameWorld.GameWorld;
 import com.grp4.Screens.GameScreen;
 
-public class ServerThread extends Thread {
-	private GameWorld myWorld;
-
+public class ServerWriter extends Thread {
+	
 	private ServerSocket server;
 	private Socket p1socket;
 	private Socket p2socket;
 
 	private PrintWriter p1writer, p2writer;
 	private BufferedReader p1reader, p2reader;
+	
+	private GameWorld myWorld;
+
+	private String cachedMessage = "";
+	private String newMessage = "";
 
 	private CyclicBarrier cb;
 	private GameScreen gs;
-
+	
 	private int portNumber = 4321;
 
-	public ServerThread(GameScreen gs, CyclicBarrier cb, GameWorld myWorld) {
-		this.myWorld = myWorld;
+	public ServerWriter(GameScreen gs, CyclicBarrier cb, GameWorld myWorld) {
 		this.gs = gs;
+		this.myWorld = myWorld;
 		this.cb = cb;
 	}
 
-	@Override
 	public void run() {
 		try {
 			sleep(2000);
@@ -91,5 +93,38 @@ public class ServerThread extends Thread {
 		}
 		
 		myWorld.ready();
+
+		while (!isInterrupted()) {
+			//System.err.println("true loop");
+			if (myWorld.isRunning()) {
+				newMessage = myWorld.getMessage();
+				//System.err.println("new message : " + newMessage);
+				
+				if (!newMessage.equals(cachedMessage)) {
+					System.err.println("coordinates sending: " + newMessage);
+					p1writer.println(newMessage);
+					p1writer.flush();
+					cachedMessage = newMessage;
+				}
+			} else if (myWorld.isReady()){
+				
+				p1writer.println("ready");
+				p1writer.flush();
+				
+			} else if (myWorld.isGameOver()) {
+				
+				p1writer.println("gg");
+				p1writer.flush();
+				
+			}
+
+//			try {
+//				sleep(1500);
+//			} catch (Exception e) {
+//				System.err.println("sleep error");
+//			}
+
+		}
 	}
+
 }

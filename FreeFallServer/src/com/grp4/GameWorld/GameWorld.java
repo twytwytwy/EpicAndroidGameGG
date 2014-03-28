@@ -21,6 +21,9 @@ public class GameWorld {
 	private int midPointY, midPointX;
 
 	private GameState currentState;
+	
+	private String loadDisplay;
+	private String message;
 
 	public enum GameState {
 		LOADING, READY, RUNNING, GAMEOVER
@@ -34,8 +37,13 @@ public class GameWorld {
 		hero = new Hero(midPointX - 10, midPointY - 20, 17, 12);
 		scroller = new ScrollHandler(this, midPointY);
 		fire = new Fire(0, 0, gameHeight - 11, 143, 11);
+		
+		loadDisplay = "";
+		message = "";
 	}
 
+	// ------------------------- game update methods --------------------------//
+	
 	public void update(float delta) {
 		runTime += delta;
 
@@ -82,7 +90,39 @@ public class GameWorld {
 			hero.die();
 			currentState = GameState.GAMEOVER;
 		}
-
+		
+		setMessage();
+	}
+	
+	// ------------------------- game object methods --------------------------//
+	
+	public String getLoadDisplay() {
+		return loadDisplay;
+	}
+	
+	public void setLoadDisplay(String text) {
+		loadDisplay = text;
+	}
+	
+	public void resetLoadDisplay(String text) {
+		loadDisplay = "...loading...";
+	}
+	
+	public String getMessage() {
+		String output;
+		synchronized (message) {
+			output = message;
+		}
+		return output;
+	}
+	
+	public void setMessage() {
+		synchronized (message) {
+			message = hero.getCoordinates();
+			//System.err.println("hero coordinates : " + message);
+			
+			message += scroller.getCoordinates();
+		}
 	}
 
 	public Hero getHero() {

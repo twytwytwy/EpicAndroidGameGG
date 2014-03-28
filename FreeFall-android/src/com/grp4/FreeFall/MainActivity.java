@@ -1,6 +1,7 @@
 package com.grp4.FreeFall;
 
 import android.os.Bundle;
+import android.view.MotionEvent;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;

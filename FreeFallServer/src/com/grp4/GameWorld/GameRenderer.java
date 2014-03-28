@@ -125,7 +125,7 @@ public class GameRenderer {
         shapeRenderer.begin(ShapeType.Filled);
         
         // Draw Background color
-        shapeRenderer.setColor(1, 1, 1, 1);
+        shapeRenderer.setColor(174 /255.0f, 238 /255.0f, 238 /255.0f, 1);
         shapeRenderer.rect(0, 0, 136, gameHeight);
         
         // End ShapeRenderer
@@ -133,8 +133,8 @@ public class GameRenderer {
         
         batcher.begin();
         batcher.disableBlending();
-        AssetLoader.shadow.draw(batcher, "Loading", (136 / 2)- (42), 76);
-        AssetLoader.font.draw(batcher, "Loading", (136 / 2)- (42 - 1), 75);
+        AssetLoader.shadow.draw(batcher, myWorld.getLoadDisplay(), (136 / 2)- (42), 76);
+        AssetLoader.font.draw(batcher, myWorld.getLoadDisplay(), (136 / 2)- (42 - 1), 75);
         batcher.end();
     }
 

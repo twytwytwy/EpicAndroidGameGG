@@ -174,6 +174,27 @@ public class GameRenderer {
         // Draw text
         AssetLoader.font.draw(batcher, score, 14, 13); // (136 / 2) - (3 * score.length() - 1)
     }
+    
+    
+    private void drawSpecialHero(float runTime) {
+    	batcher.draw(heroAnimation.getKeyFrame(runTime),
+                myWorld.getHX(), myWorld.getHY(), hero.getWidth(), hero.getHeight());
+    }
+    
+    private void drawSpecialPlatforms() {
+    	for (int i = 0; i < 12; i += 2) {
+    		batcher.draw(platform, myWorld.getPFC(i), myWorld.getPFC(i+1), pf1.getWidth(), pf1.getHeight());
+    	}
+    	
+    	batcher.draw(platform, pf2.getX(), pf2.getY(), pf2.getWidth(), pf2.getHeight());
+    	batcher.draw(platform, pf3.getX(), pf3.getY(), pf3.getWidth(), pf3.getHeight());
+    	batcher.draw(platform, pf4.getX(), pf4.getY(), pf4.getWidth(), pf4.getHeight());
+    	batcher.draw(platform, pf5.getX(), pf5.getY(), pf5.getWidth(), pf5.getHeight());
+    	batcher.draw(platform, pf6.getX(), pf6.getY(), pf6.getWidth(), pf6.getHeight());
+    	
+    }
+    
+    
 
 	public void render(float delta, float runTime) {
 
@@ -201,7 +222,8 @@ public class GameRenderer {
         //background. only draw when we have found an appropriate one
         //batcher.draw(bg, background.getX(), background.getY(), 136, 100);
         
-        drawPlatforms();
+        drawSpecialPlatforms();
+        //drawPlatforms();
         drawFire();
         drawWalls();
         
@@ -210,12 +232,15 @@ public class GameRenderer {
         batcher.enableBlending();
         
         if (myWorld.isRunning()) {
-        	drawHero(runTime);
+        	//drawHero(runTime);
+        	drawSpecialHero(runTime);
+        	
         	drawScore();
         	
         } else if (myWorld.isReady()) {
             AssetLoader.shadow.draw(batcher, "Touch me", (136 / 2)- (42), 76);
             AssetLoader.font.draw(batcher, "Touch me", (136 / 2)- (42 - 1), 75);
+            
             drawScore();
             
         } else if (myWorld.isMenu()) {
@@ -228,7 +253,7 @@ public class GameRenderer {
             AssetLoader.font.draw(batcher, "Try again?", 24, 75);
             
             drawScore();
-            drawHero(runTime);
+            //drawHero(runTime);
         }
         
         // End SpriteBatch
