@@ -17,14 +17,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class AssetLoader {
 	
 	public static Texture texture, logoTexture;
-    public static TextureRegion logo, bg, wall, skullUp, platform, fire, playButtonUp, playButtonDown;
+    public static TextureRegion logo, bg, wall, platform, fire, playButtonUp, playButtonDown;
 
-    public static Animation heroAnimation;
+    public static Animation heroAnimation, villianAnimation;
     public static TextureRegion heroMid, heroDown, heroUp;
+    public static TextureRegion villianMid, villianDown, villianUp;
     
     public static BitmapFont font, shadow;
     
-    public static Sound dead, coin;
+    // public static Sound dead, coin;
 
     public static void load() {
     	
@@ -59,26 +60,32 @@ public class AssetLoader {
         heroUp = new TextureRegion(texture, 170, 0, 17, 12);
         heroUp.flip(false, true);
         
+        villianDown = new TextureRegion(texture, 136, 0, 17, 12);
+        villianDown.flip(true, true);
+        villianMid = new TextureRegion(texture, 153, 0, 17, 12);
+        villianMid.flip(true, true);
+        villianUp = new TextureRegion(texture, 170, 0, 17, 12);
+        villianUp.flip(true, true);
+        
         // character sprite animation object
         TextureRegion[] heros = { heroDown, heroMid, heroUp };
         heroAnimation = new Animation(0.06f, heros);
         heroAnimation.setPlayMode(Animation.LOOP_PINGPONG);
         
+        TextureRegion[] villians = { villianDown, villianMid, villianUp };
+        villianAnimation = new Animation(0.06f, villians);
+        villianAnimation.setPlayMode(Animation.LOOP_PINGPONG);
+        
         // walls by the left and right of the game screen
         wall = new TextureRegion(texture, 136, 16, 22, 3);
-        skullUp = new TextureRegion(texture, 192, 0, 24, 14);
-        skullUp.flip(false, true);
-        // Create by flipping existing skullUp
-        //skullDown = new TextureRegion(skullUp);
-        //skullDown.flip(false, true);
 
         // scrolling platforms
         platform = new TextureRegion(texture, 136, 16, 22, 3);
         platform.flip(false, true);
         
         // sounds
-        dead = Gdx.audio.newSound(Gdx.files.internal("data/dead.wav"));
-        coin = Gdx.audio.newSound(Gdx.files.internal("data/coin.wav"));
+        // dead = Gdx.audio.newSound(Gdx.files.internal("data/dead.wav"));
+        // coin = Gdx.audio.newSound(Gdx.files.internal("data/coin.wav"));
         
         // fonts and their shadows
         font = new BitmapFont(Gdx.files.internal("data/text.fnt"));
@@ -89,7 +96,8 @@ public class AssetLoader {
     }
     
     public static void dispose() {
-        // We must dispose of the texture when we are finished.
+        // We must dispose off the texture when we are finished.
+    	logoTexture.dispose();
         texture.dispose();
         font.dispose();
         shadow.dispose();

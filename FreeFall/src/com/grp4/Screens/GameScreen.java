@@ -46,24 +46,19 @@ public class GameScreen implements Screen {
 		// fix the display width and set the display height
 		float screenWidth = Gdx.graphics.getWidth();
         float screenHeight = Gdx.graphics.getHeight();
-        //System.out.println(screenWidth + "   " + screenHeight);
-        // float gameWidth = 136;
-        // float gameHeight = screenHeight / (screenWidth / gameWidth);
         	
 		float gameWidth = 136;
 		float gameHeight = 226;
-        //int midPointX = (int) (gameWidth / 2);
-        //int midPointY = (int) (gameHeight / 2);
         
         runTime = 0;
         
 		world = new GameWorld(gameWidth, gameHeight); // initialize world
 		
-		cb = new CyclicBarrier(2);
-		clientSender = new ClientThreadSender(this, cb, world);
-		clientReceiver = new ClientThreadReceiver(this, cb, world);
-		clientSender.start();
-		clientReceiver.start();
+//		cb = new CyclicBarrier(2);
+//		clientSender = new ClientThreadSender(this, cb, world);
+//		clientReceiver = new ClientThreadReceiver(this, cb, world);
+//		clientSender.start();
+//		clientReceiver.start();
 		
 		Gdx.input.setInputProcessor(new InputHandler(world, clientSender, screenWidth / gameWidth, screenHeight / gameHeight));
 		renderer = new GameRenderer(world, (int) gameHeight, (int) gameWidth); // initialize renderer
@@ -109,21 +104,21 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		hostWriter.close();
-		
-		clientSender.interrupt();
-		clientReceiver.interrupt();
-		
-		try {
-			hostReader.close();
-			hostSocket.close();
-			
-			clientSender.join();
-			clientReceiver.join();
-		} catch (Exception e) {
-			System.err.println("GameScreen dispose failed!");
-			e.printStackTrace();
-		}
+//		hostWriter.close();
+//		
+//		clientSender.interrupt();
+//		clientReceiver.interrupt();
+//		
+//		try {
+//			hostReader.close();
+//			hostSocket.close();
+//			
+//			clientSender.join();
+//			clientReceiver.join();
+//		} catch (Exception e) {
+//			System.err.println("GameScreen dispose failed!");
+//			e.printStackTrace();
+//		}
 	}
 	
 	// -------- getters setters for sockets, readers, writers -------- //

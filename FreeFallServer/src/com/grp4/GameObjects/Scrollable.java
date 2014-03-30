@@ -33,8 +33,9 @@ public class Scrollable {
     }
 
     // Reset: Should Override in subclass for more specific behavior.
-    public void reset(float newY) {
+    public void reset(float newX, float newY) {
         position.y = newY;
+        position.x = newX;
         isScrolledUp = false;
     }
 

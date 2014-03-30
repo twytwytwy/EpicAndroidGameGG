@@ -24,7 +24,7 @@ public class InputHandler implements InputProcessor {
 
 	private List<SimpleButton> menuButtons;
 
-	private SimpleButton playButton;
+	private SimpleButton playButton, connectButton;
 
 	private float scaleFactorX;
 	private float scaleFactorY;
@@ -46,58 +46,82 @@ public class InputHandler implements InputProcessor {
 
 		menuButtons = new ArrayList<SimpleButton>();
 		playButton = new SimpleButton(midPointX
-				- (AssetLoader.playButtonUp.getRegionWidth() / 2),
+				- AssetLoader.playButtonUp.getRegionWidth() - 10,
+				midPointY + 50, 29, 16, AssetLoader.playButtonUp,
+				AssetLoader.playButtonDown);
+		connectButton = new SimpleButton(midPointX
+				+ 10,
 				midPointY + 50, 29, 16, AssetLoader.playButtonUp,
 				AssetLoader.playButtonDown);
 		menuButtons.add(playButton);
+		menuButtons.add(connectButton);
 	}
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		if (myWorld.isReady()) {
-			clientSender.setTouch();
-			//System.err.println("input handler touched");
-		} else if (myWorld.isGameOver()) {
-			clientSender.setTouch();
-		} else if (myWorld.isRunning()) {
-			clientSender.setTouch();
-		}
-		
-//		screenX = scaleX(screenX);
-//		screenY = scaleY(screenY);
-//		System.out.println(screenX + " " + screenY);
-//
-//		if (myWorld.isMenu()) {
-//			playButton.isTouchDown(screenX, screenY); // if clicked on the
-//														// button, isPressed =
-//														// true
-//		} else if (myWorld.isReady()) {
+//		if (myWorld.isReady()) {
+//			clientSender.setTouch();
 //			myWorld.start();
-//		}
-//
-//		hero.onClick();
-//
-//		if (myWorld.isGameOver()) {
+//			//System.err.println("input handler touched");
+//		} else if (myWorld.isGameOver()) {
+//			clientSender.setTouch();
 //			myWorld.restart();
+//		} else if (myWorld.isRunning()) {
+//			clientSender.setTouch();
+//			hero.onClick();
 //		}
+		
+		screenX = scaleX(screenX);
+		screenY = scaleY(screenY);
+		//System.out.println(screenX + " " + screenY);
+
+		if (myWorld.isMenu()) {
+			playButton.isTouchDown(screenX, screenY);
+			connectButton.isTouchDown(screenX, screenY);
+		} else if (myWorld.isReady()) {
+			myWorld.running();
+		} else if (myWorld.isRunning()) {
+			hero.onClick();
+		} else if (myWorld.isGameOver()) {
+			myWorld.restart();
+			
+			
+		} else if (myWorld.isConnectFail()) {
+			myWorld.menu();
+		} else if (myWorld.isWaiting()) {
+			connectButton.isTouchDown(screenX, screenY);
+		//} else if (myWorld.isReady2p()) {
+			//myWorld.running2p();
+		} else if (myWorld.isRunning2p()) {
+			myWorld.setMessage();
+		} else if (myWorld.isGameOver2p()) {
+			myWorld.restart2p();
+		}
 
 		return true;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-//		screenX = scaleX(screenX);
-//		screenY = scaleY(screenY);
-//
-//		if (myWorld.isMenu()) {
-//			if (playButton.isTouchUp(screenX, screenY)) { // will only return
-//															// true if isPressed
-//															// = true
-//				myWorld.ready();
-//				return true;
-//			}
-//		}
-//
+		screenX = scaleX(screenX);
+		screenY = scaleY(screenY);
+
+		if (myWorld.isMenu()) {
+			if (playButton.isTouchUp(screenX, screenY)) {											// = true
+				myWorld.ready();
+				return true;
+			}
+			if (connectButton.isTouchUp(screenX, screenY)) {
+				myWorld.waiting();
+				return true;
+			}
+		} else if (myWorld.isWaiting()) {
+			if (connectButton.isTouchUp(screenX, screenY)) {
+				myWorld.disconnected();
+				return true;
+			}
+		}
+
 		return false;
 	}
 

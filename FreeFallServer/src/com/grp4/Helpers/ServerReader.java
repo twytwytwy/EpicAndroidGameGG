@@ -49,25 +49,11 @@ public class ServerReader extends Thread{
 			try{
 				reader.readLine();
 				//System.err.println("touch received");
-				touched = true;
+				myWorld.touched();
 			}catch(Exception e){
 				System.err.println("reader error");
 				e.printStackTrace();
 				connected = false;
-			}
-			
-			if (touched) {
-				if(myWorld.isReady()){
-					myWorld.start();
-				}
-				
-				hero.onClick();
-				
-				if(myWorld.isGameOver()){
-					myWorld.restart();
-				}
-				
-				touched = false;
 			}
 			
 //			try {

@@ -6,6 +6,7 @@ import com.grp4.Helpers.ServerThread;
 import com.grp4.GameObjects.Fire;
 import com.grp4.GameObjects.Hero;
 import com.grp4.GameObjects.ScrollHandler;
+import com.sun.xml.internal.ws.client.SenderException;
 
 public class GameWorld {
 	
@@ -24,6 +25,8 @@ public class GameWorld {
 	
 	private String loadDisplay;
 	private String message;
+	private boolean touched;
+	private boolean send;
 
 	public enum GameState {
 		LOADING, READY, RUNNING, GAMEOVER
@@ -40,12 +43,31 @@ public class GameWorld {
 		
 		loadDisplay = "";
 		message = "";
+		touched = false;
+		send = false;
 	}
 
 	// ------------------------- game update methods --------------------------//
 	
+	public void event(float delta) {
+		if (touched) {
+			touched = false;
+			
+			if(isReady()){
+				start();
+			} else if (isRunning()){
+				hero.onClick();
+			} else if(isGameOver()){
+				restart();
+			}
+		}
+	}
+	
 	public void update(float delta) {
 		runTime += delta;
+		
+		event(delta);
+		setMessage(delta);
 
 		switch (currentState) {
 		case LOADING:
@@ -90,11 +112,21 @@ public class GameWorld {
 			hero.die();
 			currentState = GameState.GAMEOVER;
 		}
-		
-		setMessage();
 	}
 	
 	// ------------------------- game object methods --------------------------//
+	
+	public boolean send() {
+		return send;
+	}
+	
+	public void sent() {
+		send = false;
+	}
+	
+	public void touched() {
+		touched = true;
+	}
 	
 	public String getLoadDisplay() {
 		return loadDisplay;
@@ -116,13 +148,11 @@ public class GameWorld {
 		return output;
 	}
 	
-	public void setMessage() {
+	public void setMessage(float delta) {
 		synchronized (message) {
-			message = hero.getCoordinates();
-			//System.err.println("hero coordinates : " + message);
-			
-			message += scroller.getCoordinates();
+			message = "" + delta;
 		}
+		send = true;
 	}
 
 	public Hero getHero() {

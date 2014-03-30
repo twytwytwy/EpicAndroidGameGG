@@ -36,7 +36,7 @@ public class ClientThreadReceiver extends Thread{
 		while (!isInterrupted() && connected) {
 			try {
 				inString = reader.readLine();
-				myWorld.setMessage(inString);
+				//myWorld.setMessage(inString);
 				System.err.println("message set : " + inString);
 			} catch (Exception e) {
 				System.err.println("read line failed");

@@ -7,12 +7,10 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class Platforms extends Scrollable {
 
-	private Random r;
 	private Rectangle boundingBox;
 
 	public Platforms(float x, float y, int width, int height, float scrollSpeed) {
 		super(x, y, width, height, scrollSpeed);
-		r = new Random();
 		boundingBox = new Rectangle();
 	}
 
@@ -37,15 +35,14 @@ public class Platforms extends Scrollable {
 		}
 	}
 	
-	public void onRestart(float y, float scrollSpeed) {
+	public void onRestart(float x, float y, float scrollSpeed) {
 		velocity.y = scrollSpeed;
-		reset(y);
+		reset(x, y);
 	}
 
 	@Override
-	public void reset(float newY) {
-		super.reset(newY);
-		position.x = r.nextInt(81) + 13;
+	public void reset(float newX, float newY) {
+		super.reset(newX, newY);
 	}
 
 	public Rectangle getBoundingBox() {

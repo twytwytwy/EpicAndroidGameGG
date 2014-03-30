@@ -50,6 +50,13 @@ public class Hero {
 	public void updateReady(float runTime) {
         position.y = 2 * (float) Math.sin(7 * runTime) + originalY;
     }
+	
+	public void win() {
+		position.y = originalY;
+		position.x = originalX;
+		velocity.x = 0;
+		velocity.y = 0;
+	}
 
 	public void die() {
 		isAlive = false;
@@ -109,6 +116,14 @@ public class Hero {
 		position.y = y - height;
 		boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
 		velocity.y = 0;
+	}
+	
+	public void setPlayer1() {
+		position.x = originalX - 34;
+	}
+	
+	public void setPlayer2() {
+		position.x = originalX + 34;
 	}
 
 }
