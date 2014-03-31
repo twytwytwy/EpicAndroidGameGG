@@ -116,8 +116,8 @@ public class GameWorld {
 //			delta = .15f;
 //		}
 		
-		//delta = .0175f;
-		delta = .005f;
+		delta = .0175f;
+		//delta = .005f;
 
 		hero.update(delta);
 		scroller.update(delta);
@@ -145,8 +145,8 @@ public class GameWorld {
 	public void updateGG2p(float delta) {
 		connectionThread.sendBreak();
 		
-		//delta = .0175f;
-		delta = .005f;
+		delta = .0175f;
+		//delta = .005f;
 
 		winner.updateReady(delta);
 		loser.update(delta);
@@ -164,8 +164,8 @@ public class GameWorld {
 		}
 		System.err.println("after barrier");
 		
-		//delta = .0175f;
-		delta = .005f;
+		delta = .0175f;
+		//delta = .005f;
 
 		hero.update(delta);
 		villian.update(delta);

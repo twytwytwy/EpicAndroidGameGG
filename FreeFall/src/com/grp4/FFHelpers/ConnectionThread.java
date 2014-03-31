@@ -24,7 +24,7 @@ public class ConnectionThread extends Thread{
 	
 	private String line = "";
 	
-	private String hostname = "192.168.1.217";
+	private String hostname = "192.168.80.175";
 	private int portNumber = 4321;
 	
 	public ConnectionThread(GameWorld world, CyclicBarrier barrier) {
