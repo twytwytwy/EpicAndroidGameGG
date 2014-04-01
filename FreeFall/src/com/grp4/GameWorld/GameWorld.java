@@ -19,6 +19,10 @@ import com.grp4.GameObject.ScrollHandler;
  */
 public class GameWorld {
 
+	// most critical game data
+	private float DELTA = .0175f;
+	//private float DELTA = .005f;
+	
 	// game objects
 	private Hero hero;
 	private Hero villian;
@@ -116,8 +120,7 @@ public class GameWorld {
 //			delta = .15f;
 //		}
 		
-		delta = .0175f;
-		//delta = .005f;
+		delta = DELTA;
 
 		hero.update(delta);
 		scroller.update(delta);
@@ -144,28 +147,26 @@ public class GameWorld {
 	
 	public void updateGG2p(float delta) {
 		connectionThread.sendBreak();
-		
-		delta = .0175f;
-		//delta = .005f;
+
+		delta = DELTA;
 
 		winner.updateReady(delta);
 		loser.update(delta);
 	}
 	
 	public void updateRunning2p(float delta) {
-		System.err.println("before send signal");
+		//System.err.println("before send signal");
 		connectionThread.sendSignal(message);
 		message = "O";
-		System.err.println("before barrier");
+		//System.err.println("before barrier");
 		try {
 			barrier.await();
 		} catch (Exception e) {
 			System.err.println("main thread barrier interrupted");;
 		}
-		System.err.println("after barrier");
+		//System.err.println("after barrier");
 		
-		delta = .0175f;
-		//delta = .005f;
+		delta = DELTA;
 
 		hero.update(delta);
 		villian.update(delta);

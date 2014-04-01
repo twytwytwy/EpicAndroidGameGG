@@ -108,9 +108,11 @@ public class TestServer {
 			writer2.flush();
 			
 			while (!clientdc) {
+				System.err.println("reading from clients");
 				String fromClient = reader.readLine(); // current p1 input
 				String fromClient2 = reader2.readLine(); // current p2 input
 				
+				System.err.println("sending to clients");
 				writer.println(lastLine); // send previous compiled input to all
 				writer.flush();
 				writer2.println(lastLine2);
