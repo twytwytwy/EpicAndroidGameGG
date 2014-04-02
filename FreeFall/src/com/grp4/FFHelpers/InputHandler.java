@@ -8,7 +8,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.grp4.GameObject.Hero;
 import com.grp4.GameWorld.GameWorld;
 import com.grp4.ui.SimpleButton;
-import com.grp4.FFHelpers.ClientThreadSender;
 
 /**
  * This class handles touch input during game play and will run on a separate thread
@@ -28,15 +27,11 @@ public class InputHandler implements InputProcessor {
 
 	private float scaleFactorX;
 	private float scaleFactorY;
-	
-	private ClientThreadSender clientSender;
 
-	public InputHandler(GameWorld myWorld, ClientThreadSender clientSender, float scaleFactorX,
+	public InputHandler(GameWorld myWorld, float scaleFactorX,
 			float scaleFactorY) {
 		this.myWorld = myWorld;
 		this.hero = myWorld.getHero();
-		
-		this.clientSender = clientSender;
 
 		int midPointY = myWorld.getMidPointY();
 		int midPointX = myWorld.getMidPointX();
@@ -59,17 +54,6 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-//		if (myWorld.isReady()) {
-//			clientSender.setTouch();
-//			myWorld.start();
-//			//System.err.println("input handler touched");
-//		} else if (myWorld.isGameOver()) {
-//			clientSender.setTouch();
-//			myWorld.restart();
-//		} else if (myWorld.isRunning()) {
-//			clientSender.setTouch();
-//			hero.onClick();
-//		}
 		
 		screenX = scaleX(screenX);
 		screenY = scaleY(screenY);
@@ -85,7 +69,7 @@ public class InputHandler implements InputProcessor {
 		} else if (myWorld.isGameOver()) {
 			myWorld.restart();
 			
-			
+		// multiplayer
 		} else if (myWorld.isConnectFail()) {
 			myWorld.menu();
 		} else if (myWorld.isWaiting()) {

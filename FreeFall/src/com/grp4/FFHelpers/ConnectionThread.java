@@ -24,7 +24,7 @@ public class ConnectionThread extends Thread{
 	
 	private String line = "";
 	
-	private String hostname = "192.168.1.217";
+	private String hostname = "192.168.80.142";
 	private int portNumber = 4321;
 	
 	public ConnectionThread(GameWorld world, CyclicBarrier barrier) {
@@ -40,9 +40,11 @@ public class ConnectionThread extends Thread{
 			System.err.println("creating socket");
 			hostSocket = new Socket(hostname, portNumber);
 			System.err.println("socket connected");
+			
 			writer = new PrintWriter(hostSocket.getOutputStream(), true);
 			reader = new BufferedReader(new InputStreamReader(
 					hostSocket.getInputStream()));
+			
 			world.connected();
 			waiting = true;
 		} catch (Exception e) {

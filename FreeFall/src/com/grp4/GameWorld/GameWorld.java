@@ -20,8 +20,8 @@ import com.grp4.GameObject.ScrollHandler;
 public class GameWorld {
 
 	// most critical game data
-	private float DELTA = .0175f;
-	//private float DELTA = .005f;
+	//private float DELTA = .0175f;
+	private float DELTA = .005f;
 	
 	// game objects
 	private Hero hero;
@@ -92,6 +92,8 @@ public class GameWorld {
 		case GAMEOVER:
 			updateRunning(delta);
 			break;
+			
+			// game modes for multiplayer
 		case WAITING:
 			updateWaiting();
 			break;
@@ -114,11 +116,6 @@ public class GameWorld {
 
 	
 	public void updateRunning(float delta) {
-		
-		// delta correction of game data
-//		if (delta > .15f) {
-//			delta = .15f;
-//		}
 		
 		delta = DELTA;
 
