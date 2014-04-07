@@ -16,7 +16,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.grp4.GameObject.Fire;
-import com.grp4.GameObject.Hero;
+import com.grp4.GameObject.Character;
 import com.grp4.GameObject.Platforms;
 import com.grp4.GameObject.ScrollHandler;
 import com.grp4.TweenAccessors.Value;
@@ -27,16 +27,18 @@ import com.grp4.FFHelpers.InputHandler;
 
 public class GameRenderer {
 
+	// Super objects
 	private GameWorld myWorld;
 	private OrthographicCamera cam;
 	private ShapeRenderer shapeRenderer;
 	private SpriteBatch batcher;
 
+	// Game info
 	private int gameHeight, gameWidth, midpointY;
 
 	// Game Objects
-	private Hero hero;
-	private Hero villian;
+	private Character hero;
+	private Character villian;
 	private ScrollHandler scroller;
 	private Platforms[] platforms;
 	private Fire flames;
@@ -51,8 +53,8 @@ public class GameRenderer {
 
 	// Game Assets
 	private TextureRegion bg, platform, fire;
-	private Animation heroAnimation, villianAnimation;
-	private TextureRegion wall;
+	private Animation heroAnimationR, heroAnimationL, villianAnimationR, villianAnimationL;
+	private TextureRegion heroMidR, heroMidL, villianMidR, villianMidL;
 
 	// Tween stuff
 	private TweenManager manager;
@@ -88,6 +90,8 @@ public class GameRenderer {
 		setupTweens();
 	}
 
+	// ---------- initialisation methods ---------- //
+	
 	private void setupTweens() {
 		Tween.registerAccessor(Value.class, new ValueAccessor());
 		manager = new TweenManager();
@@ -101,24 +105,24 @@ public class GameRenderer {
 		flames = myWorld.getFire();
 		scroller = myWorld.getScroller();
 		platforms = scroller.getPlatforms();
-		// pf1 = scroller.getPf1();
-		// pf2 = scroller.getPf2();
-		// pf3 = scroller.getPf3();
-		// pf4 = scroller.getPf4();
-		// pf5 = scroller.getPf5();
-		// pf6 = scroller.getPf6();
-		// background = scroller.getBg();
 	}
 
 	private void initAssets() {
 		bg = AssetLoader.bg;
-		heroAnimation = AssetLoader.heroAnimation;
-		villianAnimation = AssetLoader.villianAnimation;
-		wall = AssetLoader.wall;
+		heroAnimationL = AssetLoader.heroAnimationL;
+		heroAnimationR = AssetLoader.heroAnimationR;
+		villianAnimationL = AssetLoader.villianAnimationL;
+		villianAnimationR = AssetLoader.villianAnimationR;
+		heroMidL = AssetLoader.heroMidL;
+		heroMidR = AssetLoader.heroMidR;
+		villianMidL = AssetLoader.villianMidL;
+		villianMidR = AssetLoader.villianDownR;
 		fire = AssetLoader.fire;
 		platform = AssetLoader.platform;
 	}
 
+	// ---------- drawing methods ---------- //
+	
 	private void drawBackground() {
 		batcher.draw(bg, 0, midpointY + 23, 136, 100);
 	}
@@ -129,15 +133,6 @@ public class GameRenderer {
 				FIRE_HEIGHT);
 		batcher.draw(fire, flames.getX(), flames.getY2(), FIRE_WIDTH,
 				FIRE_HEIGHT);
-	}
-
-	private void drawWalls() {
-
-		// left wall
-		batcher.draw(wall, hero.getLeftBound() - 13, 0, 13, gameHeight);
-
-		// right wall
-		batcher.draw(wall, hero.getRightBound() + 17, 0, 13, gameHeight);
 	}
 
 	private void drawPlatforms() {
@@ -152,7 +147,7 @@ public class GameRenderer {
 		// Draw hero at its coordinates. Retrieve the Animation object from
 		// AssetLoader
 		// Pass in the runTime variable to get the current frame.
-		batcher.draw(heroAnimation.getKeyFrame(runTime), hero.getX(),
+		batcher.draw(heroAnimationR.getKeyFrame(runTime), hero.getX(),
 				hero.getY(), HERO_WIDTH, HERO_HEIGHT);
 	}
 
@@ -161,10 +156,11 @@ public class GameRenderer {
 		// Draw hero at its coordinates. Retrieve the Animation object from
 		// AssetLoader
 		// Pass in the runTime variable to get the current frame.
-		batcher.draw(villianAnimation.getKeyFrame(runTime), villian.getX(),
+		batcher.draw(villianAnimationR.getKeyFrame(runTime), villian.getX(),
 				villian.getY(), HERO_WIDTH, HERO_HEIGHT);
 	}
 
+	//test method
 	private void drawDot() {
 		if (myWorld.isReady2p() || myWorld.isRunning2p()
 				|| myWorld.isRunning2p() || myWorld.isGameOver2p()) {
@@ -192,12 +188,9 @@ public class GameRenderer {
 			AssetLoader.font.draw(batcher, "Connecting", (136 / 2) - (50 - 1),
 					75);
 		} else {
-			AssetLoader.shadow.draw(batcher, "P2Waiting", (136 / 2) - (50), 76);
-			AssetLoader.font.draw(batcher, "P2Waiting", (136 / 2) - (50 - 1),
+			AssetLoader.shadow.draw(batcher, "Loading", (136 / 2) - (50), 76);
+			AssetLoader.font.draw(batcher, "Loading", (136 / 2) - (50 - 1),
 					75);
-		}
-		for (SimpleButton button : menuButtons) {
-			button.draw(batcher);
 		}
 	}
 
@@ -228,7 +221,8 @@ public class GameRenderer {
 		shapeRenderer.begin(ShapeType.Filled);
 
 		// Draw Background color
-		shapeRenderer.setColor(55 / 255.0f, 80 / 255.0f, 100 / 255.0f, 1);
+		shapeRenderer.setColor(55 / 255.0f, 80 / 255.0f, 100 / 255.0f, 1); //dirty blue
+		//shapeRenderer.setColor(175 / 255.0f, 238 / 255.0f, 238 / 255.0f, 1);
 		shapeRenderer.rect(0, 0, 136, gameHeight);
 
 		// End ShapeRenderer
@@ -244,8 +238,7 @@ public class GameRenderer {
 		// drawBackground();
 		drawPlatforms();
 		drawFire();
-		drawWalls();
-
+		
 		// The hero needs transparency, so we enable that again.
 		batcher.enableBlending();
 

@@ -17,11 +17,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class AssetLoader {
 	
 	public static Texture texture, logoTexture;
-    public static TextureRegion logo, bg, wall, platform, fire, playButtonUp, playButtonDown;
+    public static TextureRegion logo, bg, platform, fire, playButtonUp, playButtonDown;
 
-    public static Animation heroAnimation, villianAnimation;
-    public static TextureRegion heroMid, heroDown, heroUp;
-    public static TextureRegion villianMid, villianDown, villianUp;
+    public static Animation heroAnimationR, heroAnimationL, villianAnimationR, villianAnimationL;
+    public static TextureRegion heroMidR, heroDownR, heroUpR, heroMidL, heroDownL, heroUpL;
+    public static TextureRegion villianMidR, villianDownR, villianUpR, villianMidL, villianDownL, villianUpL;
     
     public static BitmapFont font, shadow;
     
@@ -52,32 +52,53 @@ public class AssetLoader {
         fire = new TextureRegion(texture, 0, 43, 143, 11);
         fire.flip(false, true);
         
-        // character sprite animation frames
-        heroDown = new TextureRegion(texture, 136, 0, 17, 12);
-        heroDown.flip(false, true);
-        heroMid = new TextureRegion(texture, 153, 0, 17, 12);
-        heroMid.flip(false, true);
-        heroUp = new TextureRegion(texture, 170, 0, 17, 12);
-        heroUp.flip(false, true);
+        // local player sprite animation frames (facing right)
+        heroDownR = new TextureRegion(texture, 136, 0, 17, 12);
+        heroDownR.flip(false, true);
+        heroMidR = new TextureRegion(texture, 153, 0, 17, 12);
+        heroMidR.flip(false, true);
+        heroUpR = new TextureRegion(texture, 170, 0, 17, 12);
+        heroUpR.flip(false, true);
+        // (facing left)
+        heroDownL = new TextureRegion(texture, 136, 0, 17, 12);
+        heroDownL.flip(true, true);
+        heroMidL = new TextureRegion(texture, 153, 0, 17, 12);
+        heroMidL.flip(true, true);
+        heroUpL = new TextureRegion(texture, 170, 0, 17, 12);
+        heroUpL.flip(true, true);
         
-        villianDown = new TextureRegion(texture, 136, 0, 17, 12);
-        villianDown.flip(true, true);
-        villianMid = new TextureRegion(texture, 153, 0, 17, 12);
-        villianMid.flip(true, true);
-        villianUp = new TextureRegion(texture, 170, 0, 17, 12);
-        villianUp.flip(true, true);
+        // remote player sprite animation frames
+        villianDownR = new TextureRegion(texture, 136, 0, 17, 12);
+        villianDownR.flip(false, true);
+        villianMidR = new TextureRegion(texture, 153, 0, 17, 12);
+        villianMidR.flip(false, true);
+        villianUpR = new TextureRegion(texture, 170, 0, 17, 12);
+        villianUpR.flip(false, true);
+        // (facing left)
+        villianDownL = new TextureRegion(texture, 136, 0, 17, 12);
+        villianDownL.flip(true, true);
+        villianMidL = new TextureRegion(texture, 153, 0, 17, 12);
+        villianMidL.flip(true, true);
+        villianUpL = new TextureRegion(texture, 170, 0, 17, 12);
+        villianUpL.flip(true, true);
         
-        // character sprite animation object
-        TextureRegion[] heros = { heroDown, heroMid, heroUp };
-        heroAnimation = new Animation(0.06f, heros);
-        heroAnimation.setPlayMode(Animation.LOOP_PINGPONG);
+        // local player sprite animation object
+        TextureRegion[] herosR = { heroDownR, heroMidR, heroUpR };
+        heroAnimationR = new Animation(0.06f, herosR);
+        heroAnimationR.setPlayMode(Animation.LOOP_PINGPONG);
         
-        TextureRegion[] villians = { villianDown, villianMid, villianUp };
-        villianAnimation = new Animation(0.06f, villians);
-        villianAnimation.setPlayMode(Animation.LOOP_PINGPONG);
+        TextureRegion[] herosL = { heroDownL, heroMidL, heroUpL };
+        heroAnimationL = new Animation(0.06f, herosL);
+        heroAnimationL.setPlayMode(Animation.LOOP_PINGPONG);
         
-        // walls by the left and right of the game screen
-        wall = new TextureRegion(texture, 136, 16, 22, 3);
+        // remote player sprite animation object
+        TextureRegion[] villiansR = { villianDownR, villianMidR, villianUpR };
+        villianAnimationR = new Animation(0.06f, villiansR);
+        villianAnimationR.setPlayMode(Animation.LOOP_PINGPONG);
+        
+        TextureRegion[] villiansL = { villianDownL, villianMidL, villianUpL };
+        villianAnimationL = new Animation(0.06f, villiansL);
+        villianAnimationL.setPlayMode(Animation.LOOP_PINGPONG);
 
         // scrolling platforms
         platform = new TextureRegion(texture, 136, 16, 22, 3);

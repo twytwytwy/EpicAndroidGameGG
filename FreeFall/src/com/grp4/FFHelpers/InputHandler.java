@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.grp4.GameObject.Hero;
+import com.grp4.GameObject.Character;
 import com.grp4.GameWorld.GameWorld;
 import com.grp4.ui.SimpleButton;
 
@@ -19,7 +19,7 @@ import com.grp4.ui.SimpleButton;
 public class InputHandler implements InputProcessor {
 
 	private GameWorld myWorld;
-	private Hero hero;
+	private Character hero;
 
 	private List<SimpleButton> menuButtons;
 
@@ -72,10 +72,6 @@ public class InputHandler implements InputProcessor {
 		// multiplayer
 		} else if (myWorld.isConnectFail()) {
 			myWorld.menu();
-		} else if (myWorld.isWaiting()) {
-			connectButton.isTouchDown(screenX, screenY);
-		//} else if (myWorld.isReady2p()) {
-			//myWorld.running2p();
 		} else if (myWorld.isRunning2p()) {
 			myWorld.setMessage();
 		} else if (myWorld.isGameOver2p()) {
@@ -97,11 +93,6 @@ public class InputHandler implements InputProcessor {
 			}
 			if (connectButton.isTouchUp(screenX, screenY)) {
 				myWorld.waiting();
-				return true;
-			}
-		} else if (myWorld.isWaiting()) {
-			if (connectButton.isTouchUp(screenX, screenY)) {
-				myWorld.disconnected();
 				return true;
 			}
 		}

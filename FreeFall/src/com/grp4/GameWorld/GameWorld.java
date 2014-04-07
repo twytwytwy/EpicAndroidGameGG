@@ -4,7 +4,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import com.grp4.FFHelpers.ConnectionThread;
 import com.grp4.GameObject.Fire;
-import com.grp4.GameObject.Hero;
+import com.grp4.GameObject.Character;
 import com.grp4.GameObject.ScrollHandler;
 
 /**
@@ -20,16 +20,17 @@ import com.grp4.GameObject.ScrollHandler;
 public class GameWorld {
 
 	// most critical game data
+	private float DELTA = .013f;
 	//private float DELTA = .0175f;
-	private float DELTA = .005f;
+	//private float DELTA = .005f;
 	
 	// game objects
-	private Hero hero;
-	private Hero villian;
+	private Character hero;
+	private Character villian;
 	private ScrollHandler scroller;
 	private Fire fire;
-	private Hero winner;
-	private Hero loser;
+	private Character winner;
+	private Character loser;
 	
 	// object data
 	private int HERO_WIDTH = 17;
@@ -49,18 +50,20 @@ public class GameWorld {
 	private boolean p2connected = false;
 	private boolean disconnected = false;
 	private String countdown = "Ready";
-	
 	private ConnectionThread connectionThread;
-	private CyclicBarrier barrier;
-	
-	
+	private CyclicBarrier barrier;	
 	private String message;
-	
-	
+
 	// game states
 	private GameState currentState;
 	public enum GameState {
 		MENU, READY, RUNNING, GAMEOVER, WAITING, READY2P, RUNNING2P, GAMEOVER2P, EXITING, CONNECTFAIL
+	}
+	
+	// game over states
+	private GGState ggState;
+	public enum GGState {
+		NONE, WIN, LOSE, DRAW
 	}
 
 	public GameWorld(float gameWidth, float gameHeight) {
@@ -68,14 +71,10 @@ public class GameWorld {
 		this.midPointX = (int) gameWidth / 2;
 		this.midPointY = (int) gameHeight / 2;
 		
-		hero = new Hero(midPointX - 10, midPointY - 20, HERO_WIDTH, HERO_HEIGHT);
-		villian = new Hero(midPointX - 10, midPointY - 20, HERO_WIDTH, HERO_HEIGHT);
+		hero = new Character(midPointX - 10, midPointY - 20, HERO_WIDTH, HERO_HEIGHT);
+		villian = new Character(midPointX - 10, midPointY - 20, HERO_WIDTH, HERO_HEIGHT);
 		scroller = new ScrollHandler(this, midPointY);
 		fire = new Fire(0, 0, gameHeight - FIRE_HEIGHT, FIRE_WIDTH, FIRE_HEIGHT);
-		
-		//String startPt = "" + (midPointX + 100) + (midPointY + 100);
-		//setMessage(startPt);
-		
 	}
 	
 	// ------------------------- update methods --------------------------//
@@ -100,9 +99,6 @@ public class GameWorld {
 		case EXITING:
 			updateExiting();
 			break;
-		case READY2P:
-			updateReady2p();
-			break;
 		case RUNNING2P:
 			updateRunning2p(delta);
 			break;
@@ -114,7 +110,6 @@ public class GameWorld {
 		}
 	}
 
-	
 	public void updateRunning(float delta) {
 		
 		delta = DELTA;
@@ -134,12 +129,8 @@ public class GameWorld {
 			currentState = GameState.GAMEOVER;
 		}
 	}
-	
 	public void updateReady() {
 		hero.updateReady(runTime);
-	}
-	
-	public void updateReady2p() {
 	}
 	
 	public void updateGG2p(float delta) {
@@ -150,7 +141,6 @@ public class GameWorld {
 		winner.updateReady(delta);
 		loser.update(delta);
 	}
-	
 	public void updateRunning2p(float delta) {
 		//System.err.println("before send signal");
 		connectionThread.sendSignal(message);
@@ -183,7 +173,8 @@ public class GameWorld {
 			winner = villian;
 			loser = hero;
 			currentState = GameState.GAMEOVER2P;
-		} else if (fire.collides(villian) && villian.isAlive()) {
+		} 
+		if (fire.collides(villian) && villian.isAlive()) {
 			scroller.stop();
 			villian.die();
 			hero.win();
@@ -191,15 +182,18 @@ public class GameWorld {
 			loser = villian;
 			currentState = GameState.GAMEOVER2P;
 		}
+		// check whether it is a draw
+		if (villian.isDead() && hero.isDead()) {
+			//do something
+		}
 	}
-	
 	private void updateWaiting() {
 		if (!connecting) {
 			connecting = true;
 			barrier = new CyclicBarrier(2);
 			connectionThread = new ConnectionThread(this, barrier);
 			connectionThread.start();
-			System.err.println("thread started");
+			System.out.println("thread started");
 		}
 
 		if (p2connected) {
@@ -237,7 +231,6 @@ public class GameWorld {
 	public void connected() {
 		connected = true;
 	}
-	
 	public void p2connected(String seed, String pos) {
 		p2connected = true;
 		scroller.setPlatforms(Integer.parseInt(seed));
@@ -250,93 +243,72 @@ public class GameWorld {
 			villian.setPlayer1();
 		}
 	}
-	
 	public void disconnected() {
 		disconnected = true;
 	}
-	
 	public boolean isConnected() {
 		return connected;
 	}
-	
 	public void setMessage() {
 		message = "T";
 	}
-	
 	public synchronized void setCD(String text) {
 		countdown = text;
 	}
-	
 	public synchronized String getCD() {
 		return countdown;
 	}
 
-	
 	// ------------------------- game objects methods --------------------------//
-	
-	
-	
-	public Hero getHero() {
+
+	public Character getHero() {
 		return hero;
 	}
-	
-	public Hero getVillian() {
+	public Character getVillian() {
 		return villian;
 	}
-
 	public ScrollHandler getScroller() {
 		return scroller;
 	}
-
 	public Fire getFire() {
 		return fire;
 	}
-
 	public int getMidPointX() {
 		return midPointX;
 	}
-
 	public int getMidPointY() {
 		return midPointY;
 	}
-
 	public int getScore() {
 		if (score / 6 > finalScore) {
 			finalScore = score / 6;
 		}
 		return finalScore;
 	}
-
 	public void addScore(int increment) {
 		score += increment;
 	}
-
+	
 	// ------------------------- game states methods --------------------------//
 
 	public void connectFail() {
 		currentState = GameState.CONNECTFAIL;
 	}
-	
 	public void menu() {
 		currentState = GameState.MENU;
 	}
-	
 	public void exiting() {
 		currentState = GameState.EXITING;
 	}
-	
 	public void waiting() {
 		currentState = GameState.WAITING;
 	}
-	
 	public void ready2p() {
 		currentState = GameState.READY2P;
 	}
-	
 	public void running2p() {
 		currentState = GameState.RUNNING2P;
 	}
-	
 	public void restart2p() {
 		exiting();
 		finalScore = 0;
@@ -345,15 +317,12 @@ public class GameWorld {
 		villian.onRestart();
 		scroller.onRestart();
 	}
-	
 	public void ready() {
 		currentState = GameState.READY;
 	}
-
 	public void running() {
 		currentState = GameState.RUNNING;
 	}
-
 	public void restart() {
 		currentState = GameState.MENU;
 		finalScore = 0;
@@ -363,60 +332,34 @@ public class GameWorld {
 	}
 	
 	
-	
 	public boolean isConnectFail() {
 		return currentState == GameState.CONNECTFAIL;
 	}
-	
 	public boolean isExiting() {
 		return currentState == GameState.EXITING;
 	}
-	
 	public boolean isWaiting() {
 		return currentState == GameState.WAITING;
 	}
-
 	public boolean isReady2p() {
 		return currentState == GameState.READY2P;
 	}
-	
 	public boolean isRunning2p() {
 		return currentState == GameState.RUNNING2P;
 	}
-	
 	public boolean isGameOver2p() {
 		return currentState == GameState.GAMEOVER2P;
 	}
-	
-	
 	public boolean isMenu() {
 		return currentState == GameState.MENU;
 	}
-	
 	public boolean isReady() {
 		return currentState == GameState.READY;
 	}
-
 	public boolean isRunning() {
 		return currentState == GameState.RUNNING;
 	}
-
 	public boolean isGameOver() {
 		return currentState == GameState.GAMEOVER;
 	}
 }
-
-//String command = getMessage();
-//if (command.length() == 2) {
-//	currentState = GameState.GAMEOVER;
-//} else if (command.length() == 5) {
-//	currentState = GameState.READY;
-//} else if (command.length() == 42){
-//	currentState = GameState.RUNNING;
-//	hX = Integer.parseInt(command.substring(0, 3)) - 100;
-//	hY = Integer.parseInt(command.substring(3, 6)) - 100;
-//	for (int i = 0; i < 12; i ++) {
-//		int j = 6 + 3*i;
-//		platformsCoords[i] = Integer.parseInt(command.substring(j, j+3)) - 100;
-//	}	
-//}

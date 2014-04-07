@@ -23,9 +23,10 @@ public class Platforms extends Scrollable {
 		boundingBox.set(position.x + 5, position.y, width - 10, height);
 	}
 
-	public void collides(Hero hero) {
-		if (Intersector.overlaps(hero.getBoundingCircle(), boundingBox)) {
-			hero.setParams(position.y);
+	public void collides(Character character) {
+		if (Intersector.overlaps(character.getBoundingCircle(), boundingBox)) {
+			character.setParams(position.y);
+			//character.stand();
 		}
 	}
 	

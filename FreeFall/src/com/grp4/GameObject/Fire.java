@@ -24,11 +24,11 @@ public class Fire {
 		boundingBox2.set(x, y2, width, height);
 	}
 	
-	public boolean collides(Hero hero) {
-		if (hero.getY() < y1 + height) {
-			return Intersector.overlaps(hero.getBoundingCircle(), boundingBox1);
-		} else if (hero.getY() + hero.getHeight() > y2) {
-			return Intersector.overlaps(hero.getBoundingCircle(), boundingBox2);
+	public boolean collides(Character character) {
+		if (character.getY() < y1 + height) {
+			return Intersector.overlaps(character.getBoundingCircle(), boundingBox1);
+		} else if (character.getY() + character.getHeight() > y2) {
+			return Intersector.overlaps(character.getBoundingCircle(), boundingBox2);
 		}
 		return false;
 	}

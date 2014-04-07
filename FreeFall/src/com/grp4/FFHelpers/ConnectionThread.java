@@ -6,77 +6,78 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.CyclicBarrier;
 
-import com.grp4.GameObject.Hero;
+import com.grp4.GameObject.Character;
 import com.grp4.GameWorld.GameWorld;
 
 public class ConnectionThread extends Thread{
 	private GameWorld world;
 	private CyclicBarrier barrier;
-	private Hero hero;
-	private Hero villian;
+	private Character hero, villian;
 	
 	private Socket hostSocket;
 	private PrintWriter writer;
 	private BufferedReader reader;
-	private boolean waiting = false;
-	private boolean gameOn = false;
-	private boolean broken = false;
+	private boolean waiting, gameOn, broken;
 	
-	private String line = "";
+	private String line;
 	
-	private String hostname = "192.168.80.142";
+	private String hostname = "192.168.1.217";
+	//private String hostname = "localhost";
 	private int portNumber = 4321;
+	private int timeOut = 10000;
 	
 	public ConnectionThread(GameWorld world, CyclicBarrier barrier) {
 		this.world = world;
 		this.barrier = barrier;
 		this.hero = world.getHero();
 		this.villian = world.getVillian();
+		waiting = false;
+		gameOn = false;
+		broken = false;
+		line = "";
 	}
 	
 	@Override
 	public void run() {
+		int steps = 0;
 		try {
-			System.err.println("creating socket");
 			hostSocket = new Socket(hostname, portNumber);
-			System.err.println("socket connected");
-			
+			steps ++; // 1
+			hostSocket.setSoTimeout(timeOut);
 			writer = new PrintWriter(hostSocket.getOutputStream(), true);
+			steps ++; // 2
 			reader = new BufferedReader(new InputStreamReader(
 					hostSocket.getInputStream()));
-			
+			steps ++; // 3
 			world.connected();
 			waiting = true;
 		} catch (Exception e) {
 			System.err.println("Connection error!");
-			//e.printStackTrace();
 			world.disconnected();
-			waiting = false;
 		}
 		
 		if (waiting) {
-			while (true) {
-				try {
-					if (reader.readLine().equals("ready")) {
-						String seed = reader.readLine();
-						String position = reader.readLine();
-						gameOn = true;
-						world.setCD("Ready");
-						world.p2connected(seed, position);
-						break;
-					}
-				} catch (Exception e) {
-					System.err.println("thread interrupted");
+			try {
+				if (reader.readLine().equals("ready")) {
+					String seed = reader.readLine();
+					String position = reader.readLine();
+					gameOn = true;
+					world.setCD("Ready");
+					world.p2connected(seed, position);
+				} else {
+					System.err.println("failed to setup game");
 					writer.println("break");
 					writer.flush();
-					dispose();
-					break;
+					world.disconnected();
 				}
+			} catch (Exception e) {
+				System.err.println("game setup timed out");
+				writer.println("break");
+				writer.flush();
+				world.disconnected();
 			}
 		}
-		
-		
-		
+				
 		if (gameOn) {
 			writer.println("ready");
 			writer.flush();
@@ -91,13 +92,17 @@ public class ConnectionThread extends Thread{
 				world.setCD("GO!");
 				reader.readLine(); //start
 			} catch (Exception e) {
-				System.err.println("readline error at ready");
-				e.printStackTrace();
+				System.err.println("readline error at countdown");
 			}
+			
+			//acknowledgement to run
+			writer.println("run");
 			world.running2p();
+			
 			while (true) {
 				try {
 					line = reader.readLine();
+					
 					if (line.equals("TO")) {
 						hero.onClick();
 					} else if (line.equals("OT")) {
@@ -106,17 +111,29 @@ public class ConnectionThread extends Thread{
 						hero.onClick();
 						villian.onClick();
 					}
+					
 					barrier.await();
+					
+					//do something to determine winner
+				
 				} catch (Exception e) {
-					System.err.println("thread interrupted 2");
+					System.err.println("game interrupted / connection time out");
 					writer.println("break");
 					writer.flush();
-					dispose();
+					// do something to end game
 					break;
 				}
 			}
-		}	
+		}
+		
+		// game ends. clear resources
+		try {
+			dispose(steps);
+		} catch (Exception e) {
+			System.err.println("failed to dispose resources");
+		}
 	}
+	
 	
 	public void sendSignal(String text) {
 		writer.println(text);
@@ -131,26 +148,16 @@ public class ConnectionThread extends Thread{
 		}
 	}
 	
-	public void dispose() {
-		try {
-			writer.close();
-		} catch (Exception e) {
-			System.err.println("writer was not created");
-			//e.printStackTrace();
-		}
-
-		try {
-			reader.close();
-		} catch (Exception e) {
-			System.err.println("reader was not created");
-			//e.printStackTrace();
-		}
-		
-		try {
+	public void dispose(int steps) throws Exception {
+		if (steps == 1) {
 			hostSocket.close();
-		} catch (Exception e) {
-			System.err.println("socket was not created");
-			//e.printStackTrace();
+		} else if (steps == 2) {
+			hostSocket.close();
+			writer.close();
+		} else if (steps == 3) {
+			hostSocket.close();
+			writer.close();
+			reader.close();
 		}
 	}
 }

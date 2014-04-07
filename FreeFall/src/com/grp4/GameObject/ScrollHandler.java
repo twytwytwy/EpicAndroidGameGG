@@ -92,11 +92,11 @@ public class ScrollHandler {
 
 	}
 
-	public void collides(Hero hero) {
-		float current = hero.getY() + hero.getHeight();
+	public void collides(Character character) {
+		float current = character.getY() + character.getHeight();
 		for (Platforms i : platforms) {
 			if (current - i.getY() < 8 && current - i.getY() > 0) {
-				i.collides(hero);
+				i.collides(character);
 			}
 		}
 	}
