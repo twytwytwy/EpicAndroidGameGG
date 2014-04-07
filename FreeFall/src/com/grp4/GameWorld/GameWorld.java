@@ -68,6 +68,7 @@ public class GameWorld {
 
 	public GameWorld(float gameWidth, float gameHeight) {
 		currentState = GameState.MENU;
+		ggState = GGState.NONE;
 		this.midPointX = (int) gameWidth / 2;
 		this.midPointY = (int) gameHeight / 2;
 		
@@ -138,8 +139,13 @@ public class GameWorld {
 
 		delta = DELTA;
 
-		winner.updateReady(delta);
-		loser.update(delta);
+		if (ggState == GGState.DRAW) {
+			hero.update(delta);
+			villian.update(delta);
+		} else {
+			winner.updateReady(runTime);
+			loser.update(delta);
+		}
 	}
 	public void updateRunning2p(float delta) {
 		//System.err.println("before send signal");
@@ -169,22 +175,24 @@ public class GameWorld {
 		if (fire.collides(hero) && hero.isAlive()) {
 			scroller.stop();
 			hero.die();
-			villian.win();
+			//villian.win();
 			winner = villian;
 			loser = hero;
 			currentState = GameState.GAMEOVER2P;
+			ggState = GGState.LOSE;
 		} 
 		if (fire.collides(villian) && villian.isAlive()) {
 			scroller.stop();
 			villian.die();
-			hero.win();
+			//hero.win();
 			winner = hero;
 			loser = villian;
 			currentState = GameState.GAMEOVER2P;
+			ggState = GGState.WIN;
 		}
 		// check whether it is a draw
 		if (villian.isDead() && hero.isDead()) {
-			//do something
+			ggState = GGState.DRAW;
 		}
 	}
 	private void updateWaiting() {
@@ -316,6 +324,7 @@ public class GameWorld {
 		hero.onRestart();
 		villian.onRestart();
 		scroller.onRestart();
+		ggState = GGState.NONE;
 	}
 	public void ready() {
 		currentState = GameState.READY;
@@ -361,5 +370,24 @@ public class GameWorld {
 	}
 	public boolean isGameOver() {
 		return currentState == GameState.GAMEOVER;
+	}
+	
+	public GameState getCurrentState() {
+		return currentState;
+	}
+	
+	
+	public boolean isDraw() {
+		return ggState == GGState.DRAW;
+	}
+	public boolean isWin() {
+		return ggState == GGState.WIN;
+	}
+	public boolean isLose() {
+		return ggState == GGState.LOSE;
+	}
+	
+	public GGState getGGState() {
+		return ggState;
 	}
 }

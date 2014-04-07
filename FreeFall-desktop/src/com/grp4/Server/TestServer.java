@@ -23,6 +23,9 @@ public class TestServer {
 		return MAX_WAIT_TIME;
 	}
 
+	public int getNumSessions() {
+		return gameSessions.size();
+	}
 	public boolean isFull() {
 		return numGameSessions == gameSessions.size();
 	}
@@ -69,6 +72,7 @@ public class TestServer {
 					System.err.println("sleep interrupted");
 				}
 				testServer.clear();
+				System.err.println("\t\t!! clear sessions !! SIZE " + testServer.getNumSessions());
 			}
 			
 			// accepting player 1 and 2

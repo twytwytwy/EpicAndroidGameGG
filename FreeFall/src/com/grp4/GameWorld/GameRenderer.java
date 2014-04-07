@@ -241,57 +241,76 @@ public class GameRenderer {
 		
 		// The hero needs transparency, so we enable that again.
 		batcher.enableBlending();
-
-		if (myWorld.isRunning()) {
+		
+		switch (myWorld.getCurrentState()) {
+		case RUNNING:
 			drawHero(runTime);
 			drawScore();
-		} else if (myWorld.isReady()) {
+			break;
+		case READY:
 			AssetLoader.shadow.draw(batcher, "Touch me", (136 / 2) - (42), 76);
 			AssetLoader.font
 					.draw(batcher, "Touch me", (136 / 2) - (42 - 1), 75);
 			drawHero(runTime);
 			drawScore();
-		} else if (myWorld.isMenu()) {
+			break;
+		case MENU:
 			drawMenuUI();
-		} else if (myWorld.isGameOver()) {
+			break;
+		case GAMEOVER:
 			AssetLoader.shadow.draw(batcher, "Game Over", 25, 56);
 			AssetLoader.font.draw(batcher, "Game Over", 24, 55);
 			AssetLoader.shadow.draw(batcher, "Try again?", 23, 76);
 			AssetLoader.font.draw(batcher, "Try again?", 24, 75);
 			drawScore();
 			drawHero(runTime);
-
-		} else if (myWorld.isWaiting()) {
+			break;
+			
+		case WAITING:
 			drawConnectingUI();
-		} else if (myWorld.isExiting()) {
+			break;
+		case EXITING:
 			drawExit();
-		} else if (myWorld.isConnectFail()) {
+			break;
+		case CONNECTFAIL:
 			AssetLoader.shadow.draw(batcher, "Connect", 25, 56);
 			AssetLoader.font.draw(batcher, "Connect", 24, 55);
 			AssetLoader.shadow.draw(batcher, "Fail", 23, 76);
 			AssetLoader.font.draw(batcher, "Fail", 24, 75);
-		} else if (myWorld.isReady2p()) {
+			break;
+		case READY2P:
 			String countdown = myWorld.getCD();
 			AssetLoader.shadow.draw(batcher, countdown,
 					(136 / 2) - (countdown.length() * 5), 76);
 			AssetLoader.font.draw(batcher, countdown,
-					(136 / 2) - (countdown.length() * 5), 75);
+					(136 / 2) - (countdown.length() * 5) + 1, 75);
 			drawHero(runTime);
 			drawVillian(runTime);
 			drawScore();
-
-		} else if (myWorld.isRunning2p()) {
+			break;
+		case RUNNING2P:
 			drawHero(runTime);
 			drawVillian(runTime);
 			drawScore();
-		} else if (myWorld.isGameOver2p()) {
-			AssetLoader.shadow.draw(batcher, "Game Over2", 25, 56);
-			AssetLoader.font.draw(batcher, "Game Over2", 24, 55);
-			AssetLoader.shadow.draw(batcher, "Try again?2", 23, 76);
-			AssetLoader.font.draw(batcher, "Try again?2", 24, 75);
+			break;
+		case GAMEOVER2P:
+			String displayString = "";
+			if (myWorld.isWin()) {
+				displayString = "WIN";
+			} else if (myWorld.isLose()) {
+				displayString = "LOSE";
+			} else if (myWorld.isDraw()) {
+				displayString = "DRAW";
+			}
+			AssetLoader.shadow.draw(batcher, displayString, (136 / 2) - (displayString.length()*5), 56);
+			AssetLoader.font.draw(batcher, displayString, (136 / 2) - (displayString.length()*5) + 1, 55);
 			drawScore();
 			drawHero(runTime);
 			drawVillian(runTime);
+			break;
+		
+		default:
+			break;
 		}
 
 		// End SpriteBatch

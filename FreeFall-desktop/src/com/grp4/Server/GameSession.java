@@ -48,12 +48,13 @@ public class GameSession extends Thread {
 	
 	@Override
 	public void run() {
+		System.err.println("\t\t!! session started !!");
+		
 		try {
 			initIO();
 			gameSetUp = true;
 		} catch (Exception e) {
 			System.err.println("error in getting I/O streams. abort!");
-			finished();
 		}
 		
 		// setting up seed and position for clients
@@ -65,7 +66,8 @@ public class GameSession extends Thread {
 			player2writer.println("ready");
 			player2writer.flush();
 			
-			long newSeed = System.currentTimeMillis() / 1000000;
+			long currentTime = System.currentTimeMillis();
+			long newSeed = currentTime - ((currentTime / 1000000) * 1000000);
 			
 			player1writer.println(newSeed);
 			player1writer.flush();
@@ -89,7 +91,6 @@ public class GameSession extends Thread {
 				}
 			} catch (Exception e) {
 				System.err.println("game setup time out. abort!");
-				finished();
 			}
 		}
 		
@@ -126,7 +127,6 @@ public class GameSession extends Thread {
 				}
 			} catch (Exception e) {
 				System.err.println("no acknowledgement to run from clients. abort!");
-				finished();
 			}	
 		}
 
@@ -145,10 +145,14 @@ public class GameSession extends Thread {
 				lastLine1 = response1 + response2;
 				lastLine2 = response2 + response1;
 				
+				// if lastLine is game ended then terminate
+				if (lastLine1.equals("endend")) {
+					break;
+				}
+				
 			} catch (Exception e) {
 				System.err.println("gameplay response time out!");
-				gameRunning = false;
-				finished();
+				break;
 			}
 		}
 		
@@ -167,6 +171,6 @@ public class GameSession extends Thread {
 		}
 		
 		finished();
-		System.out.println("game session closed");
+		System.err.println("\t\t!! session ended !!");
 	}
 }

@@ -54,7 +54,8 @@ public class Character {
 	}
 	
 	public void updateReady(float runTime) {
-        position.y = 2 * (float) Math.sin(7 * runTime) + originalY;
+        position.y = 5 * (float) Math.sin(7 * runTime) + originalY;
+        position.x = originalX;
     }
 	
 	public void win() {
@@ -122,9 +123,11 @@ public class Character {
 	}	
 	public void setPlayer1() {
 		position.x = originalX - 34;
+		position.y = originalY;
 	}
 	public void setPlayer2() {
 		position.x = originalX + 34;
+		position.y = originalY;
 	}
 
 }

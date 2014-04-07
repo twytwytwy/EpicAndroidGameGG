@@ -59,26 +59,54 @@ public class InputHandler implements InputProcessor {
 		screenY = scaleY(screenY);
 		//System.out.println(screenX + " " + screenY);
 
-		if (myWorld.isMenu()) {
+		switch (myWorld.getCurrentState()) {
+		case MENU:
 			playButton.isTouchDown(screenX, screenY);
 			connectButton.isTouchDown(screenX, screenY);
-		} else if (myWorld.isReady()) {
+			break;
+		case READY:
 			myWorld.running();
-		} else if (myWorld.isRunning()) {
+			break;
+		case RUNNING:
 			hero.onClick();
-		} else if (myWorld.isGameOver()) {
+			break;
+		case GAMEOVER:
 			myWorld.restart();
+			break;
 			
-		// multiplayer
-		} else if (myWorld.isConnectFail()) {
+		case CONNECTFAIL:
 			myWorld.menu();
-		} else if (myWorld.isRunning2p()) {
+			break;
+		case RUNNING2P:
 			myWorld.setMessage();
-		} else if (myWorld.isGameOver2p()) {
+			break;
+		case GAMEOVER2P:
 			myWorld.restart2p();
+			break;
+		default:
+			break;
 		}
-
+		
 		return true;
+		
+//		if (myWorld.isMenu()) {
+//			playButton.isTouchDown(screenX, screenY);
+//			connectButton.isTouchDown(screenX, screenY);
+//		} else if (myWorld.isReady()) {
+//			myWorld.running();
+//		} else if (myWorld.isRunning()) {
+//			hero.onClick();
+//		} else if (myWorld.isGameOver()) {
+//			myWorld.restart();
+//			
+//		// multiplayer
+//		} else if (myWorld.isConnectFail()) {
+//			myWorld.menu();
+//		} else if (myWorld.isRunning2p()) {
+//			myWorld.setMessage();
+//		} else if (myWorld.isGameOver2p()) {
+//			myWorld.restart2p();
+//		}
 	}
 
 	@Override

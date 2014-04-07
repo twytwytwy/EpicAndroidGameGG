@@ -66,14 +66,14 @@ public class ConnectionThread extends Thread{
 					world.p2connected(seed, position);
 				} else {
 					System.err.println("failed to setup game");
-					writer.println("break");
-					writer.flush();
+					//writer.println("break");
+					//writer.flush();
 					world.disconnected();
 				}
 			} catch (Exception e) {
 				System.err.println("game setup timed out");
-				writer.println("break");
-				writer.flush();
+				//writer.println("break");
+				//writer.flush();
 				world.disconnected();
 			}
 		}
@@ -113,14 +113,13 @@ public class ConnectionThread extends Thread{
 					}
 					
 					barrier.await();
-					
-					//do something to determine winner
 				
 				} catch (Exception e) {
 					System.err.println("game interrupted / connection time out");
-					writer.println("break");
-					writer.flush();
-					// do something to end game
+					//writer.println("break");
+					//writer.flush();
+
+					world.restart2p();
 					break;
 				}
 			}
@@ -142,7 +141,7 @@ public class ConnectionThread extends Thread{
 	
 	public void sendBreak() {
 		if (!broken) {
-			writer.println("break");
+			writer.println("end");
 			writer.flush();
 			broken = true;
 		}
