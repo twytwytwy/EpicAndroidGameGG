@@ -22,7 +22,7 @@ public class GameWorld {
 	// most critical game data
 	private float DELTA = .013f;
 	//private float DELTA = .0175f;
-	//private float DELTA = .005f;
+	//private float DELTA = .009f;
 	
 	// game objects
 	private Character hero;
@@ -169,6 +169,7 @@ public class GameWorld {
 		if (hero.isAlive() && villian.isAlive()) {
 			scroller.collides(hero);
 			scroller.collides(villian);
+			hero.collides(villian);
 		}
 		
 		// collision detection for hero and fire

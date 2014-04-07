@@ -46,7 +46,7 @@ public class TestServer {
 	}
 	
 	public static void main(String[] args) {
-		TestServer testServer = new TestServer(2);
+		TestServer testServer = new TestServer(6);
 		boolean serverRunning;
 		ServerSocket serverSocket = null;
 		

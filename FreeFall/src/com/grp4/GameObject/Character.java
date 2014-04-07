@@ -1,6 +1,7 @@
 package com.grp4.GameObject;
 
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 
 public class Character {
@@ -57,6 +58,26 @@ public class Character {
         position.y = 5 * (float) Math.sin(7 * runTime) + originalY;
         position.x = originalX;
     }
+	
+	public void collides(Character villian) {
+		float diffY = position.y - villian.getY();
+		float diffX = position.x - villian.getX();
+		if (diffX < 7 && diffX > -7 && diffY < 7 && diffY > -7) {
+			if (Intersector.overlaps(boundingCircle, villian.getBoundingCircle())) {
+				if (diffX < 0) {
+					velocity.x = -80;
+					villian.setVelocityX(80);
+				} else {
+					velocity.x = 80;
+					villian.setVelocityX(-80);
+				}
+			}
+		}
+	}
+	
+	public void setVelocityX(float x) {
+		velocity.x = x;
+	}
 	
 	public void win() {
 		position.y = originalY;
