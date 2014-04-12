@@ -10,6 +10,11 @@ import com.grp4.GameObject.Character;
 import com.grp4.GameWorld.GameWorld;
 
 public class ConnectionThread extends Thread{
+	private String hostname = "192.168.1.217";
+	//private String hostname = "localhost";
+	private int portNumber = 4321;
+	private int timeOut = 10000;
+	
 	private GameWorld world;
 	private CyclicBarrier barrier;
 	private Character hero, villian;
@@ -20,11 +25,6 @@ public class ConnectionThread extends Thread{
 	private boolean waiting, gameOn, broken;
 	
 	private String line;
-	
-	private String hostname = "192.168.1.217";
-	//private String hostname = "localhost";
-	private int portNumber = 4321;
-	private int timeOut = 10000;
 	
 	public ConnectionThread(GameWorld world, CyclicBarrier barrier) {
 		this.world = world;
@@ -66,14 +66,10 @@ public class ConnectionThread extends Thread{
 					world.p2connected(seed, position);
 				} else {
 					System.err.println("failed to setup game");
-					//writer.println("break");
-					//writer.flush();
 					world.disconnected();
 				}
 			} catch (Exception e) {
 				System.err.println("game setup timed out");
-				//writer.println("break");
-				//writer.flush();
 				world.disconnected();
 			}
 		}
@@ -116,9 +112,6 @@ public class ConnectionThread extends Thread{
 				
 				} catch (Exception e) {
 					System.err.println("game interrupted / connection time out");
-					//writer.println("break");
-					//writer.flush();
-
 					world.restart2p();
 					break;
 				}
@@ -137,12 +130,14 @@ public class ConnectionThread extends Thread{
 	public void sendSignal(String text) {
 		writer.println(text);
 		writer.flush();
+		//System.err.println(text);
 	}
 	
 	public void sendBreak() {
 		if (!broken) {
 			writer.println("end");
 			writer.flush();
+			//System.err.println("end");
 			broken = true;
 		}
 	}

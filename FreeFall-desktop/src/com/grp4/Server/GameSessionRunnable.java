@@ -5,22 +5,34 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.lwjgl.Sys;
-
-public class GameSession extends Thread {
+/*
+ * This is the Runnable logic of each game session.
+ * This will be executed by ExecutorService therefore saving the hassle of thread management.
+ */
+public class GameSessionRunnable implements Runnable{
+	
+	//--------- Game Session Resources and Settings ---------
 	private Socket player1socket, player2socket;
 	private PrintWriter player1writer, player2writer;
 	private BufferedReader player1reader, player2reader;
+	private int timeOut = 10000; // Time out for blocking socket operations
+	private int gameID;
+	
+	//--------- Game Data ---------
 	private String response1, response2, lastLine1, lastLine2;
 	
-	private boolean finished, gameSetUp, gameOn, gameRunning;
+	//--------- Game Server ----------
+	// Server guards the current count of game sessions
+	private ExecutorServer server;
 	
-	private int timeOut = 10000;
+	//--------- Game Session Stage Flags ---------
+	private boolean gameSetUp, gameOn, gameRunning;
 
-	public GameSession(Socket player1socket, Socket player2socket) {
+	public GameSessionRunnable(Socket player1socket, Socket player2socket, ExecutorServer server, int gameID) {
 		this.player1socket = player1socket;
 		this.player2socket = player2socket;
-		finished = false;
+		this.server = server;
+		this.gameID = gameID;
 		gameSetUp = false;
 		gameOn = false;
 		gameRunning = false;
@@ -30,6 +42,7 @@ public class GameSession extends Thread {
 		lastLine2 = "cd";
 	}
 	
+	// Initialise all Game Resources
 	private void initIO() throws Exception {
 		player1writer = new PrintWriter(player1socket.getOutputStream(), true);
 		player2writer = new PrintWriter(player2socket.getOutputStream(), true);
@@ -39,125 +52,117 @@ public class GameSession extends Thread {
 		player2socket.setSoTimeout(timeOut);
 	}
 	
-	private synchronized void finished() {
-		finished = true;
-	}
-	public synchronized boolean isFinished() {
-		return finished;
-	}
-	
 	@Override
 	public void run() {
-		//System.err.println("\t\t!! session started !!");
+		System.out.println("GAMESESSION: " + gameID + " started.");
 		
+		//--------- Initialisation ---------
 		try {
 			initIO();
 			gameSetUp = true;
 		} catch (Exception e) {
-			System.err.println("error in getting I/O streams. abort!");
+			System.err.println("GAMESESSION: Fatal Initialisation Error.");
 		}
 		
-		// setting up seed and position for clients
-		if (gameSetUp) {
-			System.out.println("sending seed/position info");
+		//--------- Preparing Clients for Game Session ---------
+		if (gameSetUp) { // If initialisation was successful
 			
+			// Pre-empt clients the sending of seed and position
 			player1writer.println("ready");
 			player1writer.flush();
 			player2writer.println("ready");
 			player2writer.flush();
 			
+			// generate seed based on last 7 digits of current system time
 			long currentTime = System.currentTimeMillis();
 			long newSeed = currentTime - ((currentTime / 1000000) * 1000000);
 			
+			// Send seed to clients
 			player1writer.println(newSeed);
 			player1writer.flush();
 			player2writer.println(newSeed);
 			player2writer.flush();
 			
+			// Send positions to clients to determine who is player 1/2
 			player1writer.println(1);
 			player1writer.flush();
 			player2writer.println(2);
 			player2writer.flush();
 			
-			System.out.println("seed/position info sent");
-			
+			// Acknowledgment that clients set seed and positions
 			try {
 				response1 = player1reader.readLine();
 				response2 = player2reader.readLine();
 				if (response1.equals("ready") && response2.equals("ready")) {
 					gameOn = true;
 				} else {
-					// do something to break out
+					System.err.println("GAMESESSION: Fatal Preparation Error: Clients Dis-synchronised.");
 				}
 			} catch (Exception e) {
-				System.err.println("game setup time out. abort!");
+				System.err.println("GAMESESSION: Fatal Preparation Error: Timed Out in Waiting for Client Acknowledgment.");
 			}
 		}
 		
-		if (gameOn) {
+		//--------- Running Game Session --------
+		if (gameOn) { // clients prepared to run game
 			int count = 0;
-			// 3,2,1,start
-			System.out.println("countdown");
-			while (count < 4) {
+			while (count < 4) { // Synchronised countdown between clients
 				player1writer.println(lastLine1);
 				player1writer.flush();
 				player2writer.println(lastLine2);
 				player2writer.flush();
 				try {
-					Thread.sleep(1500);
+					Thread.sleep(1000);
 				} catch (Exception e) {
-					System.err.println("countdown sleep interrupted");
+					System.err.println("GAMESESSION: Warning: Countdown Sleep Interrupted.");
 				}
 				count++;
 				
 			}
-			
-			// signal to run game on client side
 			player1writer.println(lastLine1);
 			player1writer.flush();
 			player2writer.println(lastLine2);
 			player2writer.flush();
 				
-			// acknowledgement that game is running on client side
+			// Acknowledge that clients finished countdown
 			try {
 				response1 = player1reader.readLine();
 				response2 = player2reader.readLine();
 				if (response1.equals("run") && response2.equals("run")) {
 					gameRunning = true;
+				} else {
+					System.err.println("GAMESESSION: Fatal Countdown Error: Clients Dis-synchronised.");
 				}
 			} catch (Exception e) {
-				System.err.println("no acknowledgement to run from clients. abort!");
+				System.err.println("GAMESESSION: Fatal Countdown Error: Timed Out in Waiting for Client Acknowledgment.");
 			}	
 		}
 
-		while (gameRunning) {
+		while (gameRunning) { // countdown Successful
 			try {
-				response1 = player1reader.readLine(); // current p1 input
-				response2 = player2reader.readLine(); // current p2 input
+				response1 = player1reader.readLine(); // current cycle player1 input
+				response2 = player2reader.readLine(); // current cycle player2 input
 				
-				// send previous compiled input to all
+				// send previous cycle compiled input to clients
 				player1writer.println(lastLine1); 
 				player1writer.flush();
 				player2writer.println(lastLine2);
 				player2writer.flush();
 				
-				// compile current input
+				// compile current cycle inputs for future cycle
 				lastLine1 = response1 + response2;
 				lastLine2 = response2 + response1;
-				System.err.println(lastLine1);
 				
-				// if lastLine is game ended then terminate
+				// if current cycle inputs from either client is termination flag
 				if (response1.equals("end") || response2.equals("end")) {
-					break;
+					break; // terminate running loop
 				}
 				
 			} catch (Exception e) {
-				System.err.println("gameplay response time out!");
+				System.err.println("GAMESESSION: Message Relay Time Out: Timed Out during Gameplay.");
 				break;
 			}
 		}
-		
-		System.out.println("game ended or client dc");
 		
 		// dispose all resources
 		player1writer.close();
@@ -168,10 +173,10 @@ public class GameSession extends Thread {
 			player1reader.close();
 			player2reader.close();
 		} catch (Exception e) {
-			System.err.println("error in closing socket/ buffered reader");
+			System.err.println("GAMESESSION: Resource Disposal Failure.");
 		}
 		
-		finished();
-		System.err.println("\t\t!! session ended !!");
+		server.removeGame();
+		System.out.println("GAMESESSION: " + gameID + " Closed.");
 	}
 }

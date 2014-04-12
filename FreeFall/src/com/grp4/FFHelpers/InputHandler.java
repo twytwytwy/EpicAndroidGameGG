@@ -3,27 +3,21 @@ package com.grp4.FFHelpers;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.grp4.GameObject.Character;
 import com.grp4.GameWorld.GameWorld;
 import com.grp4.ui.SimpleButton;
 
-/**
- * This class handles touch input during game play and will run on a separate thread
- * Scales the input co-ordinates to the game co-ordinates
- * 
- * @author Wei Yang
- *
- */
+// handles touch input from the user
+// game loop will check for touch inputs before updating the game
 public class InputHandler implements InputProcessor {
 
 	private GameWorld myWorld;
 	private Character hero;
 
-	private List<SimpleButton> menuButtons;
+	private List<SimpleButton> buttons;
 
-	private SimpleButton playButton, connectButton;
+	private SimpleButton singlePlayerButton, multiPlayerButton, exitButton;
 
 	private float scaleFactorX;
 	private float scaleFactorY;
@@ -39,17 +33,22 @@ public class InputHandler implements InputProcessor {
 		this.scaleFactorX = scaleFactorX;
 		this.scaleFactorY = scaleFactorY;
 
-		menuButtons = new ArrayList<SimpleButton>();
-		playButton = new SimpleButton(midPointX
-				- AssetLoader.playButtonUp.getRegionWidth() - 10,
-				midPointY + 50, 29, 16, AssetLoader.playButtonUp,
-				AssetLoader.playButtonDown);
-		connectButton = new SimpleButton(midPointX
-				+ 10,
-				midPointY + 50, 29, 16, AssetLoader.playButtonUp,
-				AssetLoader.playButtonDown);
-		menuButtons.add(playButton);
-		menuButtons.add(connectButton);
+		buttons = new ArrayList<SimpleButton>();
+		singlePlayerButton = new SimpleButton(midPointX
+				- 23, midPointY + 30, 45, 15,
+				AssetLoader.singlePlayerButtonUp,
+				AssetLoader.singlePlayerButtonDown);
+		multiPlayerButton = new SimpleButton(midPointX
+				- 23, midPointY + 50, 45, 15,
+				AssetLoader.multiPlayerButtonUp,
+				AssetLoader.multiPlayerButtonDown);
+		exitButton = new SimpleButton(midPointX
+				- 23, midPointY + 70, 45, 15,
+				AssetLoader.exitButtonUp,
+				AssetLoader.exitButtonDown);
+		buttons.add(singlePlayerButton);
+		buttons.add(multiPlayerButton);
+		buttons.add(exitButton);
 	}
 
 	@Override
@@ -57,12 +56,11 @@ public class InputHandler implements InputProcessor {
 		
 		screenX = scaleX(screenX);
 		screenY = scaleY(screenY);
-		//System.out.println(screenX + " " + screenY);
 
 		switch (myWorld.getCurrentState()) {
 		case MENU:
-			playButton.isTouchDown(screenX, screenY);
-			connectButton.isTouchDown(screenX, screenY);
+			singlePlayerButton.isTouchDown(screenX, screenY);
+			multiPlayerButton.isTouchDown(screenX, screenY);
 			break;
 		case READY:
 			myWorld.running();
@@ -71,7 +69,7 @@ public class InputHandler implements InputProcessor {
 			hero.onClick();
 			break;
 		case GAMEOVER:
-			myWorld.restart();
+			exitButton.isTouchDown(screenX, screenY);
 			break;
 			
 		case CONNECTFAIL:
@@ -81,32 +79,13 @@ public class InputHandler implements InputProcessor {
 			myWorld.setMessage();
 			break;
 		case GAMEOVER2P:
-			myWorld.restart2p();
+			exitButton.isTouchDown(screenX, screenY);
 			break;
 		default:
 			break;
 		}
 		
 		return true;
-		
-//		if (myWorld.isMenu()) {
-//			playButton.isTouchDown(screenX, screenY);
-//			connectButton.isTouchDown(screenX, screenY);
-//		} else if (myWorld.isReady()) {
-//			myWorld.running();
-//		} else if (myWorld.isRunning()) {
-//			hero.onClick();
-//		} else if (myWorld.isGameOver()) {
-//			myWorld.restart();
-//			
-//		// multiplayer
-//		} else if (myWorld.isConnectFail()) {
-//			myWorld.menu();
-//		} else if (myWorld.isRunning2p()) {
-//			myWorld.setMessage();
-//		} else if (myWorld.isGameOver2p()) {
-//			myWorld.restart2p();
-//		}
 	}
 
 	@Override
@@ -114,40 +93,35 @@ public class InputHandler implements InputProcessor {
 		screenX = scaleX(screenX);
 		screenY = scaleY(screenY);
 
-		if (myWorld.isMenu()) {
-			if (playButton.isTouchUp(screenX, screenY)) {											// = true
+		switch (myWorld.getCurrentState()) {
+		case MENU:
+			if (singlePlayerButton.isTouchUp(screenX, screenY)) {											// = true
 				myWorld.ready();
 				return true;
-			}
-			if (connectButton.isTouchUp(screenX, screenY)) {
+			} else if (multiPlayerButton.isTouchUp(screenX, screenY)) {
 				myWorld.waiting();
 				return true;
 			}
+			break;
+		case GAMEOVER:
+			if (exitButton.isTouchUp(screenX, screenY)) {
+				myWorld.restart();
+				return true;
+			}
+		case GAMEOVER2P:
+			if (exitButton.isTouchUp(screenX, screenY)) {
+				myWorld.restart2p();
+				return true;
+			}
+		default:
+			break;
 		}
 
 		return false;
 	}
 
 	@Override
-	public boolean keyDown(int keycode) { // for desktop debugging purposes
-
-		// Can now use Space Bar to play the game
-//		if (keycode == Keys.SPACE) {
-//
-//			if (myWorld.isMenu()) {
-//				myWorld.ready();
-//			} else if (myWorld.isReady()) {
-//				myWorld.start();
-//			}
-//
-//			hero.onClick();
-//
-//			if (myWorld.isGameOver()) {
-//				myWorld.restart();
-//			}
-//
-//		}
-
+	public boolean keyDown(int keycode) {
 		return false;
 	}
 
@@ -189,8 +163,8 @@ public class InputHandler implements InputProcessor {
 		return (int) (screenY / scaleFactorY);
 	}
 
-	public List<SimpleButton> getMenuButtons() {
-		return menuButtons;
+	public List<SimpleButton> getButtons() {
+		return buttons;
 	}
 
 }

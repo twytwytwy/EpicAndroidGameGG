@@ -7,7 +7,6 @@ import aurelienribon.tweenengine.TweenEquations;
 import aurelienribon.tweenengine.TweenManager;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -15,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.grp4.GameObject.Background;
 import com.grp4.GameObject.Fire;
 import com.grp4.GameObject.Character;
 import com.grp4.GameObject.Platforms;
@@ -42,26 +42,26 @@ public class GameRenderer {
 	private ScrollHandler scroller;
 	private Platforms[] platforms;
 	private Fire flames;
+	private Background bg1, bg2;
 
 	// object data
-	private int HERO_WIDTH = 17;
-	private int HERO_HEIGHT = 12;
-	private int FIRE_WIDTH = 143;
-	private int FIRE_HEIGHT = 11;
-	public int PLATFORM_WIDTH = 30;
-	public int PLATFORM_HEIGHT = 4;
+	private int HERO_WIDTH = GameWorld.HERO_WIDTH;
+	private int HERO_HEIGHT = GameWorld.HERO_HEIGHT;
+	private int FIRE_WIDTH = GameWorld.FIRE_WIDTH;
+	private int FIRE_HEIGHT = GameWorld.FIRE_HEIGHT;
+	private int PLATFORM_WIDTH = GameWorld.PLATFORM_WIDTH;
+	private int PLATFORM_HEIGHT = GameWorld.PLATFORM_HEIGHT;
 
 	// Game Assets
-	private TextureRegion bg, platform, fire;
-	private Animation heroAnimationR, heroAnimationL, villianAnimationR, villianAnimationL;
-	private TextureRegion heroMidR, heroMidL, villianMidR, villianMidL;
+	private TextureRegion bgA, bgB, platform, fire;
+	private Animation heroAnimation, villianAnimation;
 
 	// Tween stuff
 	private TweenManager manager;
 	private Value alpha = new Value();
 
 	// Buttons
-	private List<SimpleButton> menuButtons;
+	private List<SimpleButton> buttons;
 
 	public GameRenderer(GameWorld world, int gameHeight, int gameWidth) {
 
@@ -71,8 +71,8 @@ public class GameRenderer {
 		this.midpointY = gameHeight / 2;
 		this.gameWidth = gameWidth;
 
-		this.menuButtons = ((InputHandler) Gdx.input.getInputProcessor())
-				.getMenuButtons();
+		this.buttons = ((InputHandler) Gdx.input.getInputProcessor())
+				.getButtons();
 
 		cam = new OrthographicCamera();
 		cam.setToOrtho(true, 136, gameHeight); // this will be the game width
@@ -105,18 +105,15 @@ public class GameRenderer {
 		flames = myWorld.getFire();
 		scroller = myWorld.getScroller();
 		platforms = scroller.getPlatforms();
+		bg1 = scroller.getBg1();
+		bg2 = scroller.getBg2();
 	}
 
 	private void initAssets() {
-		bg = AssetLoader.bg;
-		heroAnimationL = AssetLoader.heroAnimationL;
-		heroAnimationR = AssetLoader.heroAnimationR;
-		villianAnimationL = AssetLoader.villianAnimationL;
-		villianAnimationR = AssetLoader.villianAnimationR;
-		heroMidL = AssetLoader.heroMidL;
-		heroMidR = AssetLoader.heroMidR;
-		villianMidL = AssetLoader.villianMidL;
-		villianMidR = AssetLoader.villianDownR;
+		bgA = AssetLoader.bgA;
+		bgB = AssetLoader.bgB;
+		heroAnimation = AssetLoader.heroAnimation;
+		villianAnimation = AssetLoader.villianAnimation;
 		fire = AssetLoader.fire;
 		platform = AssetLoader.platform;
 	}
@@ -124,7 +121,8 @@ public class GameRenderer {
 	// ---------- drawing methods ---------- //
 	
 	private void drawBackground() {
-		batcher.draw(bg, 0, midpointY + 23, 136, 100);
+		batcher.draw(bgA, bg1.getX(), bg1.getY(), bg1.getWidth(), bg1.getHeight());
+		batcher.draw(bgB, bg2.getX(), bg2.getY(), bg2.getWidth(), bg2.getHeight());
 	}
 
 	private void drawFire() {
@@ -147,7 +145,7 @@ public class GameRenderer {
 		// Draw hero at its coordinates. Retrieve the Animation object from
 		// AssetLoader
 		// Pass in the runTime variable to get the current frame.
-		batcher.draw(heroAnimationR.getKeyFrame(runTime), hero.getX(),
+		batcher.draw(heroAnimation.getKeyFrame(runTime), hero.getX(),
 				hero.getY(), HERO_WIDTH, HERO_HEIGHT);
 	}
 
@@ -156,32 +154,18 @@ public class GameRenderer {
 		// Draw hero at its coordinates. Retrieve the Animation object from
 		// AssetLoader
 		// Pass in the runTime variable to get the current frame.
-		batcher.draw(villianAnimationR.getKeyFrame(runTime), villian.getX(),
+		batcher.draw(villianAnimation.getKeyFrame(runTime), villian.getX(),
 				villian.getY(), HERO_WIDTH, HERO_HEIGHT);
 	}
 
-	//test method
-	private void drawDot() {
-		if (myWorld.isReady2p() || myWorld.isRunning2p()
-				|| myWorld.isRunning2p() || myWorld.isGameOver2p()) {
-			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(Color.RED);
-			shapeRenderer.circle(villian.getX() + 9, villian.getY() + 6,
-					6.5f);
-			shapeRenderer.end();
-		}
-	}
-
 	private void drawMenuUI() {
-		AssetLoader.shadow.draw(batcher, "FreeFall", (136 / 2) - (35), 76);
-		AssetLoader.font.draw(batcher, "FreeFall", (136 / 2) - (35 - 1), 75);
-
-		for (SimpleButton button : menuButtons) {
-			button.draw(batcher);
-		}
+		//AssetLoader.shadow.draw(batcher, "FreeFall", (136 / 2) - (35), 76);
+		AssetLoader.font2.draw(batcher, "FreeFall", (136 / 2) - 36, 75);
+		buttons.get(0).draw(batcher);
+		buttons.get(1).draw(batcher);
 	}
 
-	private void drawConnectingUI() {
+	private void drawConnecting() {
 		if (!myWorld.isConnected()) {
 			AssetLoader.shadow
 					.draw(batcher, "Connecting", (136 / 2) - (50), 76);
@@ -210,6 +194,22 @@ public class GameRenderer {
 		AssetLoader.font.draw(batcher, score, 14, 13); // (136 / 2) - (3 *
 														// score.length() - 1)
 	}
+	
+	private void drawExitButton() {
+		buttons.get(2).draw(batcher);
+	}
+	
+	//test method
+//	private void drawDot() {
+//		shapeRenderer.begin(ShapeType.Filled);
+//		shapeRenderer.setColor(0, 255 / 255.0f, 0, 0.1f);
+//		shapeRenderer.circle(hero.getBoundingCircle().x,
+//				hero.getBoundingCircle().y, hero.getBoundingCircle().radius);
+//		shapeRenderer.setColor(255 / 255.0f, 0, 0, 0.1f);
+//		shapeRenderer.circle(villian.getBoundingCircle().x,
+//				villian.getBoundingCircle().y, villian.getBoundingCircle().radius);
+//		shapeRenderer.end();
+//	}
 
 	public void render(float delta, float runTime) {
 
@@ -235,7 +235,7 @@ public class GameRenderer {
 		// transparency.
 		batcher.disableBlending();
 
-		// drawBackground();
+		drawBackground();
 		drawPlatforms();
 		drawFire();
 		
@@ -248,8 +248,8 @@ public class GameRenderer {
 			drawScore();
 			break;
 		case READY:
-			AssetLoader.shadow.draw(batcher, "Touch me", (136 / 2) - (42), 76);
-			AssetLoader.font
+			//AssetLoader.shadow.draw(batcher, "Touch me", (136 / 2) - (42), 76);
+			AssetLoader.font2
 					.draw(batcher, "Touch me", (136 / 2) - (42 - 1), 75);
 			drawHero(runTime);
 			drawScore();
@@ -258,16 +258,15 @@ public class GameRenderer {
 			drawMenuUI();
 			break;
 		case GAMEOVER:
-			AssetLoader.shadow.draw(batcher, "Game Over", 25, 56);
-			AssetLoader.font.draw(batcher, "Game Over", 24, 55);
-			AssetLoader.shadow.draw(batcher, "Try again?", 23, 76);
-			AssetLoader.font.draw(batcher, "Try again?", 24, 75);
 			drawScore();
 			drawHero(runTime);
+			//AssetLoader.shadow.draw(batcher, "Game Over", 25, 56);
+			AssetLoader.font2.draw(batcher, "Game Over", 20, 55);
+			drawExitButton();
 			break;
 			
 		case WAITING:
-			drawConnectingUI();
+			drawConnecting();
 			break;
 		case EXITING:
 			drawExit();
@@ -280,9 +279,8 @@ public class GameRenderer {
 			break;
 		case READY2P:
 			String countdown = myWorld.getCD();
-			AssetLoader.shadow.draw(batcher, countdown,
-					(136 / 2) - (countdown.length() * 5), 76);
-			AssetLoader.font.draw(batcher, countdown,
+			//AssetLoader.shadow.draw(batcher, countdown, (136 / 2) - (countdown.length() * 5), 76);
+			AssetLoader.font2.draw(batcher, countdown,
 					(136 / 2) - (countdown.length() * 5) + 1, 75);
 			drawHero(runTime);
 			drawVillian(runTime);
@@ -294,6 +292,9 @@ public class GameRenderer {
 			drawScore();
 			break;
 		case GAMEOVER2P:
+			drawScore();
+			drawHero(runTime);
+			drawVillian(runTime);
 			String displayString = "";
 			if (myWorld.isWin()) {
 				displayString = "WIN";
@@ -302,11 +303,9 @@ public class GameRenderer {
 			} else if (myWorld.isDraw()) {
 				displayString = "DRAW";
 			}
-			AssetLoader.shadow.draw(batcher, displayString, (136 / 2) - (displayString.length()*5), 56);
-			AssetLoader.font.draw(batcher, displayString, (136 / 2) - (displayString.length()*5) + 1, 55);
-			drawScore();
-			drawHero(runTime);
-			drawVillian(runTime);
+			//AssetLoader.shadow.draw(batcher, displayString, (136 / 2) - (displayString.length()*5), 56);
+			AssetLoader.font2.draw(batcher, displayString, (136 / 2) - (displayString.length()*5) + 1, 55);
+			drawExitButton();
 			break;
 		
 		default:
@@ -315,32 +314,10 @@ public class GameRenderer {
 
 		// End SpriteBatch
 		batcher.end();
-		drawDot();
+//		if (myWorld.getCurrentState() == GameState.RUNNING2P) {
+//			drawDot();
+//		}
 		drawTransition(delta);
-
-		// --------------------------- collision render for debug
-		// --------------------------------------//
-
-		// shapeRenderer.begin(ShapeType.Filled);
-		// shapeRenderer.setColor(Color.RED);
-		// shapeRenderer.circle(villian.getX(), villian.getY(),
-		// hero.getBoundingCircle().radius);
-		//
-		// shapeRenderer.rect(pf1.getBoundingBox().x, pf1.getBoundingBox().y,
-		// pf1.getBoundingBox().width, pf1.getBoundingBox().height);
-		// shapeRenderer.rect(pf2.getBoundingBox().x, pf2.getBoundingBox().y,
-		// pf2.getBoundingBox().width, pf2.getBoundingBox().height);
-		// shapeRenderer.rect(pf3.getBoundingBox().x, pf3.getBoundingBox().y,
-		// pf3.getBoundingBox().width, pf3.getBoundingBox().height);
-		// shapeRenderer.rect(pf4.getBoundingBox().x, pf4.getBoundingBox().y,
-		// pf4.getBoundingBox().width, pf4.getBoundingBox().height);
-		// shapeRenderer.rect(pf5.getBoundingBox().x, pf5.getBoundingBox().y,
-		// pf5.getBoundingBox().width, pf5.getBoundingBox().height);
-		// shapeRenderer.rect(pf6.getBoundingBox().x, pf6.getBoundingBox().y,
-		// pf6.getBoundingBox().width, pf6.getBoundingBox().height);
-		//
-		// shapeRenderer.end();
-
 	}
 
 	private void drawTransition(float delta) {

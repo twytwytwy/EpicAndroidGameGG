@@ -1,0 +1,11 @@
+texture3.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+flyingall
+  rotate: false
+  xy: 2, 2
+  size: 131, 31
+  orig: 145, 193
+  offset: 5, 152
+  index: -1

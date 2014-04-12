@@ -1,6 +1,5 @@
 package com.grp4.Server;
 
-
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -30,10 +29,13 @@ public class TestServer {
 		return numGameSessions == gameSessions.size();
 	}
 	public void clear() {
-		for (GameSession i : gameSessions) {
-			if (i.isFinished()) {
+		int currentNum = gameSessions.size();
+		System.err.println("current size of array : " + currentNum);
+		for (int i = currentNum-1; i >= 0; i--) {
+			GameSession currentSession = gameSessions.get(i);
+			if (currentSession.isFinished()) {
 				try {
-					i.join();
+					currentSession.join();
 				} catch (Exception e) {
 					System.err.println("error in joining game session thread");
 				}
@@ -46,7 +48,7 @@ public class TestServer {
 	}
 	
 	public static void main(String[] args) {
-		TestServer testServer = new TestServer(6);
+		TestServer testServer = new TestServer(2);
 		boolean serverRunning;
 		ServerSocket serverSocket = null;
 		
@@ -66,6 +68,7 @@ public class TestServer {
 			// if number of game sessions at maximum capacity
 			// wait till some session has finished and clear them
 			while(testServer.isFull()) {
+				System.err.println("game is full");
 				try {
 					Thread.sleep(10000);
 				} catch (Exception e) {
@@ -82,12 +85,12 @@ public class TestServer {
 			boolean gameSessionOn = false;
 
 			try {
-				System.out.println("awaiting player 1");
+				//System.out.println("awaiting player 1");
 				player1socket = serverSocket.accept();
 				numConnected ++; //2
 				System.out.println("player 1 connected");
 				
-				System.out.println("awaiting player 2");
+				//System.out.println("awaiting player 2");
 				player2socket = serverSocket.accept();
 				System.out.println("player 2 connected");
 				

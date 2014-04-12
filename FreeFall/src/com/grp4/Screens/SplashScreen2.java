@@ -1,5 +1,6 @@
 package com.grp4.Screens;
 
+
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
@@ -23,27 +24,30 @@ import com.grp4.TweenAccessors.SpriteAccessor;
  * @author Wei Yang
  *
  */
-public class SplashScreen implements Screen {
+public class SplashScreen2 implements Screen {
 	
 	private TweenManager manager;
     private SpriteBatch batcher;
     private Sprite sprite;
     private FFGame game;
 
-    public SplashScreen(FFGame game) {
+    public SplashScreen2(FFGame game) {
         this.game = game;
     }
 
     
     @Override
     public void show() {
-        sprite = new Sprite(AssetLoader.logoSUTD);
+        sprite = new Sprite(AssetLoader.logoISTD);
+
         sprite.setColor(1, 1, 1, 0);
+
 
         float width = Gdx.graphics.getWidth();
         float height = Gdx.graphics.getHeight();
         float desiredWidth = width * .85f;
         float scale = desiredWidth / sprite.getWidth();
+
 
         sprite.setSize(sprite.getWidth() * scale, sprite.getHeight() * scale);
         sprite.setPosition((width / 2) - (sprite.getWidth() / 2), (height / 2)
@@ -65,7 +69,7 @@ public class SplashScreen implements Screen {
         	// will set the current game screen to GameScreen object
             @Override
             public void onEvent(int type, BaseTween<?> source) {
-                game.setScreen(new SplashScreen2(game));
+                game.setScreen(new SplashScreen3(game));
             }
         };
 

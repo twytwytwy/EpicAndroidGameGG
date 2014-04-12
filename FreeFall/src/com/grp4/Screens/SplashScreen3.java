@@ -15,29 +15,21 @@ import com.grp4.FFHelpers.AssetLoader;
 import com.grp4.FreeFall.FFGame;
 import com.grp4.TweenAccessors.SpriteAccessor;
 
-/**
- * This screen handles the welcoming screen of the game
- * it is not important to the game mechanics and serves no purposes
- * so no need to understand. Just for us to feel shiok
- * 
- * @author Wei Yang
- *
- */
-public class SplashScreen implements Screen {
+public class SplashScreen3 implements Screen{
 	
 	private TweenManager manager;
     private SpriteBatch batcher;
     private Sprite sprite;
     private FFGame game;
 
-    public SplashScreen(FFGame game) {
+    public SplashScreen3(FFGame game) {
         this.game = game;
     }
 
     
     @Override
     public void show() {
-        sprite = new Sprite(AssetLoader.logoSUTD);
+        sprite = new Sprite(AssetLoader.logoG4G);
         sprite.setColor(1, 1, 1, 0);
 
         float width = Gdx.graphics.getWidth();
@@ -65,7 +57,7 @@ public class SplashScreen implements Screen {
         	// will set the current game screen to GameScreen object
             @Override
             public void onEvent(int type, BaseTween<?> source) {
-                game.setScreen(new SplashScreen2(game));
+                game.setScreen(new GameScreen());
             }
         };
 
@@ -84,7 +76,7 @@ public class SplashScreen implements Screen {
     @Override
     public void render(float delta) {
         manager.update(delta);
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
         batcher.begin();
         sprite.draw(batcher);

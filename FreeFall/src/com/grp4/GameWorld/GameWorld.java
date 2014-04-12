@@ -2,6 +2,8 @@ package com.grp4.GameWorld;
 
 import java.util.concurrent.CyclicBarrier;
 
+import com.badlogic.gdx.audio.Sound;
+import com.grp4.FFHelpers.AssetLoader;
 import com.grp4.FFHelpers.ConnectionThread;
 import com.grp4.GameObject.Fire;
 import com.grp4.GameObject.Character;
@@ -18,11 +20,6 @@ import com.grp4.GameObject.ScrollHandler;
  *
  */
 public class GameWorld {
-
-	// most critical game data
-	private float DELTA = .013f;
-	//private float DELTA = .0175f;
-	//private float DELTA = .009f;
 	
 	// game objects
 	private Character hero;
@@ -32,11 +29,28 @@ public class GameWorld {
 	private Character winner;
 	private Character loser;
 	
+	// game resources
+	private Sound dead, coin, fall, stapler;
+	
 	// object data
-	private int HERO_WIDTH = 17;
-	private int HERO_HEIGHT = 12;
-	private int FIRE_WIDTH = 143;
-	private int FIRE_HEIGHT = 11;
+	private final float DELTA = .0175f;
+	//private final float DELTA = .013f;
+	//private final float DELTA = .009f;
+	
+	public static final int HERO_WIDTH = 17;
+	public static final int HERO_HEIGHT = 12;
+	public static final int FIRE_WIDTH = 143;
+	public static final int FIRE_HEIGHT = 11;
+	
+	public static final int GRAVITY = 50;
+	public static final int MOVEMENT = 80;
+	public static final int LEFTBOUND = -16;
+	public static final int RIGHTBOUND = 135;
+	
+	public static final int SCROLL_SPEED = -60;
+	public static final int PLATFORM_GAP = 40;
+	public static final int PLATFORM_WIDTH = 30;
+	public static final int PLATFORM_HEIGHT = 4;
 
 	// game information
 	private int score = 0;
@@ -76,12 +90,19 @@ public class GameWorld {
 		villian = new Character(midPointX - 10, midPointY - 20, HERO_WIDTH, HERO_HEIGHT);
 		scroller = new ScrollHandler(this, midPointY);
 		fire = new Fire(0, 0, gameHeight - FIRE_HEIGHT, FIRE_WIDTH, FIRE_HEIGHT);
+		
+		coin = AssetLoader.coin;
+		dead = AssetLoader.dead;
+		fall = AssetLoader.fall;
+		stapler = AssetLoader.stapler;
 	}
 	
 	// ------------------------- update methods --------------------------//
 
 	public void update(float delta) {
 		runTime += delta;
+		
+		scroller.updateClouds(DELTA);
 
 		switch (currentState) {
 		case MENU:
@@ -127,7 +148,7 @@ public class GameWorld {
 		if (fire.collides(hero) && hero.isAlive()) {
 			scroller.stop();
 			hero.die();
-			currentState = GameState.GAMEOVER;
+			gameover();
 		}
 	}
 	public void updateReady() {
@@ -179,7 +200,7 @@ public class GameWorld {
 			//villian.win();
 			winner = villian;
 			loser = hero;
-			currentState = GameState.GAMEOVER2P;
+			gameover2p();
 			ggState = GGState.LOSE;
 		} 
 		if (fire.collides(villian) && villian.isAlive()) {
@@ -188,7 +209,7 @@ public class GameWorld {
 			//hero.win();
 			winner = hero;
 			loser = villian;
-			currentState = GameState.GAMEOVER2P;
+			gameover2p();
 			ggState = GGState.WIN;
 		}
 		// check whether it is a draw
@@ -230,9 +251,15 @@ public class GameWorld {
 			System.err.println("thread joined");
 		} catch (Exception e) {
 			System.err.println("unable to join connection thread");
-			//e.printStackTrace();
 		}
-		connectFail();
+		
+		if (ggState == GGState.NONE) {
+			connectFail();
+		} else {
+			menu();
+		}
+		
+		ggState = GGState.NONE;
 	}
 	
 	// ------------------------- connection methods --------------------------//
@@ -291,6 +318,7 @@ public class GameWorld {
 	public int getScore() {
 		if (score / 6 > finalScore) {
 			finalScore = score / 6;
+			stapler.play();
 		}
 		return finalScore;
 	}
@@ -300,6 +328,20 @@ public class GameWorld {
 	
 	// ------------------------- game states methods --------------------------//
 
+	public void gameover2p() {
+		if (currentState != GameState.GAMEOVER2P) {
+			currentState = GameState.GAMEOVER2P;
+			dead.play();
+			fall.play();
+		}
+	}
+	public void gameover() {
+		if (currentState != GameState.GAMEOVER) {
+			currentState = GameState.GAMEOVER;
+			dead.play();
+			fall.play();
+		}
+	}
 	public void connectFail() {
 		currentState = GameState.CONNECTFAIL;
 	}
@@ -325,7 +367,6 @@ public class GameWorld {
 		hero.onRestart();
 		villian.onRestart();
 		scroller.onRestart();
-		ggState = GGState.NONE;
 	}
 	public void ready() {
 		currentState = GameState.READY;
@@ -339,38 +380,6 @@ public class GameWorld {
 		score = 0;
 		hero.onRestart();
 		scroller.onRestart();
-	}
-	
-	
-	public boolean isConnectFail() {
-		return currentState == GameState.CONNECTFAIL;
-	}
-	public boolean isExiting() {
-		return currentState == GameState.EXITING;
-	}
-	public boolean isWaiting() {
-		return currentState == GameState.WAITING;
-	}
-	public boolean isReady2p() {
-		return currentState == GameState.READY2P;
-	}
-	public boolean isRunning2p() {
-		return currentState == GameState.RUNNING2P;
-	}
-	public boolean isGameOver2p() {
-		return currentState == GameState.GAMEOVER2P;
-	}
-	public boolean isMenu() {
-		return currentState == GameState.MENU;
-	}
-	public boolean isReady() {
-		return currentState == GameState.READY;
-	}
-	public boolean isRunning() {
-		return currentState == GameState.RUNNING;
-	}
-	public boolean isGameOver() {
-		return currentState == GameState.GAMEOVER;
 	}
 	
 	public GameState getCurrentState() {

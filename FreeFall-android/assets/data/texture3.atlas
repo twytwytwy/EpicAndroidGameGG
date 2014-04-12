@@ -1,0 +1,61 @@
+
+texture3.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+twitter-bird-sprite
+  rotate: false
+  xy: 1, 771
+  size: 915, 204
+  orig: 1250, 313
+  offset: 12, 55
+  index: -1
+cloud3
+  rotate: false
+  xy: 1, 144
+  size: 417, 625
+  orig: 417, 625
+  offset: 0, 0
+  index: -1
+twitter-bird-sprite2
+  rotate: false
+  xy: 420, 594
+  size: 539, 175
+  orig: 740, 925
+  offset: 17, 0
+  index: -1
+cloud2
+  rotate: false
+  xy: 420, 292
+  size: 200, 300
+  orig: 200, 300
+  offset: 0, 0
+  index: -1
+mushrooms
+  rotate: false
+  xy: 1, 33
+  size: 336, 109
+  orig: 1333, 894
+  offset: 0, 0
+  index: -1
+playbuttonblue
+  rotate: false
+  xy: 420, 239
+  size: 158, 51
+  orig: 158, 51
+  offset: 0, 0
+  index: -1
+playbuttonbluedown
+  rotate: false
+  xy: 622, 541
+  size: 158, 51
+  orig: 158, 51
+  offset: 0, 0
+  index: -1
+flyingall
+  rotate: false
+  xy: 1, 1
+  size: 131, 30
+  orig: 145, 193
+  offset: 5, 152
+  index: -1

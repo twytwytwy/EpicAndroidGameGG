@@ -1,8 +1,11 @@
 package com.grp4.GameObject;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
+import com.grp4.FFHelpers.AssetLoader;
+import com.grp4.GameWorld.GameWorld;
 
 public class Character {
 	private Vector2 position, velocity, acceleration;
@@ -13,16 +16,13 @@ public class Character {
 	private Circle boundingCircle;
 
 	private boolean isAlive;
-	private CharacterState currentState;
 	
-	private static final int GRAVITY = 50;
-	private static final int MOVEMENT = 80;
-	private int leftBound = 12;
-	private int rightBound = 107;
+	private int GRAVITY = GameWorld.GRAVITY;
+	private int MOVEMENT = GameWorld.MOVEMENT;
+	private int LEFTBOUND = GameWorld.LEFTBOUND;
+	private int RIGHTBOUND = GameWorld.RIGHTBOUND;
 	
-	public enum CharacterState {
-		FLYL, FLYR, STANDL, STANDR
-	}
+	private Sound smashed = AssetLoader.smashed;
 
 	public Character(float x, float y, int width, int height) {
 		this.width = width;
@@ -36,17 +36,16 @@ public class Character {
 		boundingCircle = new Circle();
 
 		isAlive = true;
-		currentState = CharacterState.FLYR;
 	}
 
 	public void update(float delta) {
 
 		velocity.add(acceleration.cpy().scl(delta));
 
-		if (position.x < leftBound) {
-			position.x = leftBound;
-		} else if (position.x > rightBound) {
-			position.x = rightBound;
+		if (position.x < LEFTBOUND) {
+			position.x = RIGHTBOUND;
+		} else if (position.x > RIGHTBOUND) {
+			position.x = LEFTBOUND;
 		}
 
 		position.add(velocity.cpy().scl(delta));
@@ -71,6 +70,7 @@ public class Character {
 					velocity.x = 80;
 					villian.setVelocityX(-80);
 				}
+				smashed.play();
 			}
 		}
 	}
@@ -124,10 +124,10 @@ public class Character {
 		return boundingCircle;
 	}	
 	public int getLeftBound() {
-		return leftBound;
+		return LEFTBOUND;
 	}	
 	public int getRightBound() {
-		return rightBound;
+		return RIGHTBOUND;
 	}
 	
 	public boolean isAlive() {
@@ -145,10 +145,12 @@ public class Character {
 	public void setPlayer1() {
 		position.x = originalX - 34;
 		position.y = originalY;
+		velocity.x = MOVEMENT;
 	}
 	public void setPlayer2() {
 		position.x = originalX + 34;
 		position.y = originalY;
+		velocity.x = -1 * MOVEMENT;
 	}
 
 }

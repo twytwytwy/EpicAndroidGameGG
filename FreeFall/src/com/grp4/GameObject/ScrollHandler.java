@@ -7,20 +7,22 @@ import com.grp4.GameWorld.GameWorld;
 public class ScrollHandler {
 	
 	private GameWorld myWorld;
+	private Background bg1, bg2;
 	private Platforms pf1, pf2, pf3, pf4, pf5, pf6;
 	private Platforms[] platforms;
 	
 	private Random r;
+	private Random cloudRandom;
 
 	// ScrollHandler will use the constants below to determine
 	// how fast we need to scroll and also determine
 	// the size of the gap between platforms
 
 	// Capital letters are used by convention when naming constants.
-	public int SCROLL_SPEED = -60;
-	public int PLATFORM_GAP = 40;
-	public int PLATFORM_WIDTH = 30;
-	public int PLATFORM_HEIGHT = 4;
+	private int SCROLL_SPEED = GameWorld.SCROLL_SPEED;
+	private int PLATFORM_GAP = GameWorld.PLATFORM_GAP;
+	private int PLATFORM_WIDTH = GameWorld.PLATFORM_WIDTH;
+	private int PLATFORM_HEIGHT = GameWorld.PLATFORM_HEIGHT;
 
 	private float midPointY;
 
@@ -33,6 +35,7 @@ public class ScrollHandler {
 		midPointY = yPos;
 		
 		r = new Random();
+		cloudRandom = new Random();
 
 		pf1 = new Platforms(nextRandom(), yPos*2, PLATFORM_WIDTH, PLATFORM_HEIGHT,
 				SCROLL_SPEED);
@@ -48,6 +51,22 @@ public class ScrollHandler {
 				PLATFORM_HEIGHT, SCROLL_SPEED);
 
 		platforms = new Platforms[] { pf1, pf2, pf3, pf4, pf5, pf6 };
+		
+		bg1 = new Background(-50, 0, 250, (int) (midPointY*3), SCROLL_SPEED/4);
+		bg2 = new Background(-50, bg1.getY() + bg1.getHeight() - 1, 250, (int) (midPointY*3), SCROLL_SPEED/4);
+		
+	}
+	
+	public void updateClouds(float delta) {
+		bg1.update(delta);
+		bg2.update(delta);
+		
+		if (bg1.isScrolledUp) {
+			bg1.reset(cloudRandom.nextInt(100) - 100, bg2.getY() + bg2.getHeight() - 1);
+		}
+		if (bg2.isScrolledUp) {
+			bg2.reset(cloudRandom.nextInt(100) - 100, bg1.getY() + bg1.getHeight() - 1);
+		}
 	}
 
 	public void update(float delta) {
@@ -77,19 +96,12 @@ public class ScrollHandler {
 			pf6.reset(nextRandom(), pf5.getTailY() + PLATFORM_GAP);
 			addScore(1);
 		}
-
-		// Same with background
-//		if (bg.isScrolledUp) {
-//			bg.reset(midPointY * 2);
-//		}
 	}
 
 	public void stop() {
-
 		for (Platforms i : platforms) {
 			i.stop();
 		}
-
 	}
 
 	public void collides(Character character) {
@@ -102,13 +114,20 @@ public class ScrollHandler {
 	}
 	
 	public void onRestart() {
-		
 		pf1.onRestart(nextRandom(), midPointY*2, SCROLL_SPEED);
 		pf2.onRestart(nextRandom(), pf1.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
 		pf3.onRestart(nextRandom(), pf2.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
 		pf4.onRestart(nextRandom(), pf3.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
 		pf5.onRestart(nextRandom(), pf4.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
 		pf6.onRestart(nextRandom(), pf5.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
+	}
+	
+	public Background getBg1() {
+		return bg1;
+	}
+	
+	public Background getBg2() {
+		return bg2;
 	}
 
 	public Platforms getPf1() {
@@ -140,7 +159,7 @@ public class ScrollHandler {
 	}
 	
 	private int nextRandom() {
-		return r.nextInt(81) + 13;
+		return r.nextInt(107);
 	}
 	
 	public Platforms[] getPlatforms() {
