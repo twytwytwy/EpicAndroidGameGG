@@ -34,7 +34,7 @@ public class GameRenderer {
 	private SpriteBatch batcher;
 
 	// Game info
-	private int gameHeight, gameWidth, midpointY;
+	private int gameHeight, gameWidth, midpointY, midpointX;
 
 	// Game Objects
 	private Character hero;
@@ -70,6 +70,7 @@ public class GameRenderer {
 		this.gameHeight = gameHeight;
 		this.midpointY = gameHeight / 2;
 		this.gameWidth = gameWidth;
+		this.midpointX = gameWidth / 2;
 
 		this.buttons = ((InputHandler) Gdx.input.getInputProcessor())
 				.getButtons();
@@ -160,7 +161,7 @@ public class GameRenderer {
 
 	private void drawMenuUI() {
 		//AssetLoader.shadow.draw(batcher, "FreeFall", (136 / 2) - (35), 76);
-		AssetLoader.font2.draw(batcher, "FreeFall", (136 / 2) - 36, 75);
+		AssetLoader.font2.draw(batcher, "FreeFall", midpointX - 36, 65);
 		buttons.get(0).draw(batcher);
 		buttons.get(1).draw(batcher);
 	}
@@ -255,13 +256,17 @@ public class GameRenderer {
 			drawScore();
 			break;
 		case MENU:
+			drawHero(runTime);
+			drawVillian(runTime);
 			drawMenuUI();
 			break;
 		case GAMEOVER:
 			drawScore();
 			drawHero(runTime);
 			//AssetLoader.shadow.draw(batcher, "Game Over", 25, 56);
-			AssetLoader.font2.draw(batcher, "Game Over", 20, 55);
+			AssetLoader.font2.draw(batcher, "Game Over", 20, 65);
+			AssetLoader.font2.draw(batcher, "Highscore", 25, 120);
+			AssetLoader.font2.draw(batcher, "" + AssetLoader.getHighScore(), midpointX - 5, 135);
 			drawExitButton();
 			break;
 			
@@ -279,9 +284,8 @@ public class GameRenderer {
 			break;
 		case READY2P:
 			String countdown = myWorld.getCD();
-			//AssetLoader.shadow.draw(batcher, countdown, (136 / 2) - (countdown.length() * 5), 76);
 			AssetLoader.font2.draw(batcher, countdown,
-					(136 / 2) - (countdown.length() * 5) + 1, 75);
+					midpointX - (countdown.length() * 5) + 1, 75);
 			drawHero(runTime);
 			drawVillian(runTime);
 			drawScore();
@@ -297,14 +301,15 @@ public class GameRenderer {
 			drawVillian(runTime);
 			String displayString = "";
 			if (myWorld.isWin()) {
-				displayString = "WIN";
+				displayString = "You  WON!";
 			} else if (myWorld.isLose()) {
-				displayString = "LOSE";
+				displayString = "You LOST!";
 			} else if (myWorld.isDraw()) {
-				displayString = "DRAW";
+				displayString = "it's  A  DRAW!";
 			}
-			//AssetLoader.shadow.draw(batcher, displayString, (136 / 2) - (displayString.length()*5), 56);
-			AssetLoader.font2.draw(batcher, displayString, (136 / 2) - (displayString.length()*5) + 1, 55);
+			AssetLoader.font2.draw(batcher, displayString, midpointX - (displayString.length()*4), 65);
+			AssetLoader.font2.draw(batcher, "2P Highscore", 10, 120);
+			AssetLoader.font2.draw(batcher, "" + AssetLoader.get2pHighScore(), midpointX - 5, 135);
 			drawExitButton();
 			break;
 		

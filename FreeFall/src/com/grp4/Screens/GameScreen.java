@@ -6,45 +6,47 @@ import com.grp4.FFHelpers.InputHandler;
 import com.grp4.GameWorld.GameRenderer;
 import com.grp4.GameWorld.GameWorld;
 
-/**
- * this is the screen for the main gameplay
+/*
+ * This is the main screen of the game.
+ * It will initialise all game objects and rendering helpers.
  * 
- * Methods:
- * constructor - creates the GameWorld and GameRenderer object
- * render() - called by the game at a rate of fps
- * 		takes in delta, delay time, given by the game framework
- * 		updates gameWorld and render GameRenderer
- * 		increment runTime by delta
- * 
- * @author Wei Yang
- *
+ * render() method will be called by the framework 60x a second
+ * this method will update GameWorld and render GameRenderer
  */
 public class GameScreen implements Screen {
 	
+	//---------- Game Objects and Helpers ---------
 	private GameWorld world;
 	private GameRenderer renderer;
 	
-	private float runTime; // determines which frame in animation
+	// Determines the frame for all animations
+	private float runTime;
 	
 	public GameScreen() {
 		// LibGDX advises: fix the display width and set the display height
 		
-		float screenWidth = Gdx.graphics.getWidth();  // actual device screen size
+		// device screen size
+		float screenWidth = Gdx.graphics.getWidth(); 
         float screenHeight = Gdx.graphics.getHeight();
-        	
+        
+        // fixed game coordinates
 		float gameWidth = 136;
 		float gameHeight = 226;
         
         runTime = 0;
         
-		world = new GameWorld(gameWidth, gameHeight); // initialize world
-		
+        // initialise game world
+		world = new GameWorld(gameWidth, gameHeight);
+		// initialise touch input handler
 		Gdx.input.setInputProcessor(new InputHandler(world, screenWidth / gameWidth, screenHeight / gameHeight));
-		renderer = new GameRenderer(world, (int) gameHeight, (int) gameWidth); // initialize renderer
+		// initialise game renderer
+		renderer = new GameRenderer(world, (int) gameHeight, (int) gameWidth);
 	}
 
+	// This method will be called 60x a second.
+	// Delay between each call is given by delta, which can be used for scaling.
 	@Override
-	public void render(float delta) { // delta is the delay between each call to render() its built into libGDX
+	public void render(float delta) {
 		runTime += delta;
 		world.update(delta); // GameWorld updates 
         renderer.render(delta, runTime); // GameRenderer renders

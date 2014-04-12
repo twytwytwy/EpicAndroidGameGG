@@ -9,22 +9,28 @@ import java.util.concurrent.CyclicBarrier;
 import com.grp4.GameObject.Character;
 import com.grp4.GameWorld.GameWorld;
 
+/*
+ * This thread handles connection and communication for game client
+ */
 public class ConnectionThread extends Thread{
+	
+	//--------- Network Settings --------
 	private String hostname = "192.168.1.217";
 	//private String hostname = "localhost";
-	private int portNumber = 4321;
-	private int timeOut = 10000;
+	private int PORTNUMBER = 4321;
+	private int TIMEOUT = 10000;
 	
-	private GameWorld world;
+	//--------- Communication Resources, Objects & Flags----------
 	private CyclicBarrier barrier;
-	private Character hero, villian;
-	
 	private Socket hostSocket;
 	private PrintWriter writer;
 	private BufferedReader reader;
 	private boolean waiting, gameOn, broken;
+	private String receivedCommand;
 	
-	private String line;
+	//--------- Game Objects ----------
+	private GameWorld world;
+	private Character hero, villian;
 	
 	public ConnectionThread(GameWorld world, CyclicBarrier barrier) {
 		this.world = world;
@@ -34,29 +40,32 @@ public class ConnectionThread extends Thread{
 		waiting = false;
 		gameOn = false;
 		broken = false;
-		line = "";
+		receivedCommand = "";
 	}
 	
 	@Override
 	public void run() {
-		int steps = 0;
+		
+		//---------- Establishing connection with Server ----------
+		int connectionStage = 0;
 		try {
-			hostSocket = new Socket(hostname, portNumber);
-			steps ++; // 1
-			hostSocket.setSoTimeout(timeOut);
+			hostSocket = new Socket(hostname, PORTNUMBER);
+			connectionStage ++; // 1
+			hostSocket.setSoTimeout(TIMEOUT);
 			writer = new PrintWriter(hostSocket.getOutputStream(), true);
-			steps ++; // 2
+			connectionStage ++; // 2
 			reader = new BufferedReader(new InputStreamReader(
 					hostSocket.getInputStream()));
-			steps ++; // 3
+			connectionStage ++; // 3
 			world.connected();
 			waiting = true;
 		} catch (Exception e) {
-			System.err.println("Connection error!");
-			world.disconnected();
+			System.err.println("CONNECTION: Fatal Initialisation Error: Failed to connect with Server.");
+			world.disconnected(); // flag disconnection to game world
 		}
 		
-		if (waiting) {
+		//---------- Game Set Up ----------
+		if (waiting) { // if connection with Server was successful
 			try {
 				if (reader.readLine().equals("ready")) {
 					String seed = reader.readLine();
@@ -65,17 +74,18 @@ public class ConnectionThread extends Thread{
 					world.setCD("Ready");
 					world.p2connected(seed, position);
 				} else {
-					System.err.println("failed to setup game");
-					world.disconnected();
+					System.err.println("CONNECTION: Fatal Setup Error: Server dis-synchronised.");
+					world.disconnected(); // flag disconnection to game world
 				}
 			} catch (Exception e) {
-				System.err.println("game setup timed out");
-				world.disconnected();
+				System.err.println("CONNECTION: Fatal Setup Error: Connection time out.");
+				world.disconnected(); // flag disconnection to game world
 			}
 		}
-				
-		if (gameOn) {
-			writer.println("ready");
+		
+		//--------- Maintaining Gameplay Communication ----------
+		if (gameOn) { // if game was successfully set up
+			writer.println("ready"); // acknowledgement to server
 			writer.flush();
 			try {
 				reader.readLine(); //3
@@ -88,22 +98,22 @@ public class ConnectionThread extends Thread{
 				world.setCD("GO!");
 				reader.readLine(); //start
 			} catch (Exception e) {
-				System.err.println("readline error at countdown");
+				System.err.println("CONNECTION: Warning: Countdown interrupted.");
 			}
 			
-			//acknowledgement to run
-			writer.println("run");
-			world.running2p();
+			
+			writer.println("run"); // acknowledgement to server
+			world.running2p(); // run the multiplayer game
 			
 			while (true) {
 				try {
-					line = reader.readLine();
+					receivedCommand = reader.readLine();
 					
-					if (line.equals("TO")) {
+					if (receivedCommand.equals("TO")) {
 						hero.onClick();
-					} else if (line.equals("OT")) {
+					} else if (receivedCommand.equals("OT")) {
 						villian.onClick();
-					} else if (line.equals("TT")) {
+					} else if (receivedCommand.equals("TT")) {
 						hero.onClick();
 						villian.onClick();
 					}
@@ -111,37 +121,38 @@ public class ConnectionThread extends Thread{
 					barrier.await();
 				
 				} catch (Exception e) {
-					System.err.println("game interrupted / connection time out");
-					world.restart2p();
+					System.err.println("CONNECTION: Warning: Thread interrupted / Connection time out.");
+					world.restart2p(); // flag game world to restart
 					break;
 				}
 			}
 		}
 		
-		// game ends. clear resources
+		//--------- Clear Resources ---------
 		try {
-			dispose(steps);
+			dispose(connectionStage);
 		} catch (Exception e) {
-			System.err.println("failed to dispose resources");
+			System.err.println("CONNECTION: Warning: Failed to dispose resources.");
 		}
 	}
 	
-	
+	// Sends the text to Server over the socket output stream
 	public void sendSignal(String text) {
 		writer.println(text);
 		writer.flush();
 		//System.err.println(text);
 	}
 	
+	// Sends termination signal to Server over the socket output stream
 	public void sendBreak() {
 		if (!broken) {
 			writer.println("end");
 			writer.flush();
-			//System.err.println("end");
 			broken = true;
 		}
 	}
 	
+	// Clear communication resources
 	public void dispose(int steps) throws Exception {
 		if (steps == 1) {
 			hostSocket.close();

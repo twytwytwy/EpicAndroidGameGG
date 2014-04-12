@@ -3,14 +3,16 @@ package com.grp4.GameObject;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 
+/*
+ * boundary objects in game
+ * Hitboxes are "death-zones" causing players to die
+ */
 public class Fire {
 	
-	private float x;
-	private float y1;
-	private float y2;
-	private int width;
-	private int height;
+	private float x, y1, y2;
+	private int width, height;
 	
+	// Hitboxes
 	private Rectangle boundingBox1 = new Rectangle();
 	private Rectangle boundingBox2 = new Rectangle();
 	
@@ -24,6 +26,7 @@ public class Fire {
 		boundingBox2.set(x, y2, width, height);
 	}
 	
+	// Check if character has collided with this object
 	public boolean collides(Character character) {
 		if (character.getY() < y1 + height) {
 			return Intersector.overlaps(character.getBoundingCircle(), boundingBox1);

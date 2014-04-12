@@ -6,19 +6,18 @@ import com.grp4.GameWorld.GameWorld;
 
 public class ScrollHandler {
 	
+	// Game World
 	private GameWorld myWorld;
+	
+	//---------- Scrolling Game Objects
 	private Background bg1, bg2;
 	private Platforms pf1, pf2, pf3, pf4, pf5, pf6;
 	private Platforms[] platforms;
 	
-	private Random r;
-	private Random cloudRandom;
+	// Random element
+	private Random r, cloudRandom;
 
-	// ScrollHandler will use the constants below to determine
-	// how fast we need to scroll and also determine
-	// the size of the gap between platforms
-
-	// Capital letters are used by convention when naming constants.
+	//---------- Game Data (Scrolling-Related) ----------
 	private int SCROLL_SPEED = GameWorld.SCROLL_SPEED;
 	private int PLATFORM_GAP = GameWorld.PLATFORM_GAP;
 	private int PLATFORM_WIDTH = GameWorld.PLATFORM_WIDTH;
@@ -26,16 +25,14 @@ public class ScrollHandler {
 
 	private float midPointY;
 
-	// Constructor receives a float that tells us where we need to create our
-	// platforms and sides
+	
 	public ScrollHandler(GameWorld myWorld, float yPos) {
 		
 		this.myWorld = myWorld;
-		
 		midPointY = yPos;
-		
-		r = new Random();
-		cloudRandom = new Random();
+
+		r = new Random(System.currentTimeMillis()); // this is to determine platform positions
+		cloudRandom = new Random(); // this is for the clouds in the background
 
 		pf1 = new Platforms(nextRandom(), yPos*2, PLATFORM_WIDTH, PLATFORM_HEIGHT,
 				SCROLL_SPEED);
@@ -57,6 +54,7 @@ public class ScrollHandler {
 		
 	}
 	
+	// scrolls background and reset when necessary
 	public void updateClouds(float delta) {
 		bg1.update(delta);
 		bg2.update(delta);
@@ -69,41 +67,37 @@ public class ScrollHandler {
 		}
 	}
 
+	// scrolls all platforms and reset them when necessary
 	public void update(float delta) {
 		// Update our objects;
 		for (Platforms i : platforms) {
 			i.update(delta);
 		}
 
-		// Check if any of the platforms are scrolled up,
-		// and reset accordingly
-		if (pf1.isScrolledUp()) {
-			pf1.reset(nextRandom(), pf6.getTailY() + PLATFORM_GAP);
-			addScore(1);
-		} else if (pf2.isScrolledUp()) {
-			pf2.reset(nextRandom(), pf1.getTailY() + PLATFORM_GAP);
-			addScore(1);
-		} else if (pf3.isScrolledUp()) {
-			pf3.reset(nextRandom(), pf2.getTailY() + PLATFORM_GAP);
-			addScore(1);
-		} else if (pf4.isScrolledUp()) {
-			pf4.reset(nextRandom(), pf3.getTailY() + PLATFORM_GAP);
-			addScore(1);
-		} else if (pf5.isScrolledUp()) {
-			pf5.reset(nextRandom(),pf4.getTailY() + PLATFORM_GAP);
-			addScore(1);
-		} else if (pf6.isScrolledUp()) {
-			pf6.reset(nextRandom(), pf5.getTailY() + PLATFORM_GAP);
-			addScore(1);
+		// Check if any of the platforms are scrolled up, and reset
+		for (int i = 0; i < 6; i ++) {
+			Platforms j = platforms[i];
+			if (j.isScrolledUp) {
+				if (i == 0) {
+					j.reset(nextRandom(), platforms[5].getTailY() + PLATFORM_GAP);
+					addScore(1);
+				} else {
+					j.reset(nextRandom(), platforms[i-1].getTailY() + PLATFORM_GAP);
+					addScore(1);
+				}
+			}
 		}
 	}
 
+	// stop scrolling all platforms and hide them from view
 	public void stop() {
 		for (Platforms i : platforms) {
 			i.stop();
+			i.position.y = midPointY * 2 + 5;
 		}
 	}
 
+	// check if character collided with any platforms
 	public void collides(Character character) {
 		float current = character.getY() + character.getHeight();
 		for (Platforms i : platforms) {
@@ -113,13 +107,16 @@ public class ScrollHandler {
 		}
 	}
 	
+	// reset all platform positions
 	public void onRestart() {
-		pf1.onRestart(nextRandom(), midPointY*2, SCROLL_SPEED);
-		pf2.onRestart(nextRandom(), pf1.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
-		pf3.onRestart(nextRandom(), pf2.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
-		pf4.onRestart(nextRandom(), pf3.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
-		pf5.onRestart(nextRandom(), pf4.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
-		pf6.onRestart(nextRandom(), pf5.getTailY() + PLATFORM_GAP, SCROLL_SPEED);
+		for (int i = 0; i < 6; i ++) {
+			Platforms j = platforms[i];
+			if (i == 0) {
+				j.onRestart(nextRandom(), midPointY*2, SCROLL_SPEED);
+			} else {
+				j.onRestart(nextRandom(), platforms[i-1].getTailY() + PLATFORM_GAP, SCROLL_SPEED);
+			}
+		}
 	}
 	
 	public Background getBg1() {
@@ -129,43 +126,23 @@ public class ScrollHandler {
 	public Background getBg2() {
 		return bg2;
 	}
-
-	public Platforms getPf1() {
-		return pf1;
-	}
-
-	public Platforms getPf2() {
-		return pf2;
-	}
-
-	public Platforms getPf3() {
-		return pf3;
-	}
-
-	public Platforms getPf4() {
-		return pf4;
-	}
-
-	public Platforms getPf5() {
-		return pf5;
-	}
-
-	public Platforms getPf6() {
-		return pf6;
-	}
 	
+	// flag game world to increment score
 	private void addScore(int increment) {
 	    myWorld.addScore(increment);
 	}
 	
+	// generate the next random number
 	private int nextRandom() {
 		return r.nextInt(107);
 	}
 	
+	// return array of all platform objects
 	public Platforms[] getPlatforms() {
 		return platforms;
 	}
 	
+	// change the Random seed and re-position all platforms based on new seed
 	public void setPlatforms(int seed) {
 		r = new Random(seed);
 		for (Platforms i : platforms) {

@@ -2,13 +2,13 @@ package com.grp4.GameObject;
 
 import com.badlogic.gdx.math.Vector2;
 
-
+/*
+ * Super-class for all objects in the game that scrolls
+ */
 public class Scrollable {
 	
-	protected Vector2 position;
-    protected Vector2 velocity;
-    protected int width;
-    protected int height;
+	protected Vector2 position, velocity;
+    protected int width, height;
     protected boolean isScrolledUp;
     
     public Scrollable(float x, float y, int width, int height, float scrollSpeed) {
@@ -19,27 +19,28 @@ public class Scrollable {
         isScrolledUp = false;
     }
 
+    // Scrolls object based on delta time step
     public void update(float delta) {
         position.add(velocity.cpy().scl(delta));
 
-        // If the Scrollable object is no longer visible:
+        // If the Scrollable object is no longer visible, flag to reset
         if (position.y + height < 0) {
             isScrolledUp = true;
         }
     }
     
+    // Stop scrolling
     public void stop() {
     	velocity.y = 0;
     }
 
-    // Reset: Should Override in subclass for more specific behavior.
+    // Reset: Should Override in subclass for more specific behavio
     public void reset(float newX, float newY) {
         position.y = newY;
         position.x = newX;
         isScrolledUp = false;
     }
 
-    // Getters for instance variables
     public boolean isScrolledUp() {
         return isScrolledUp;
     }

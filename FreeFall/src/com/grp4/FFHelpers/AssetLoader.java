@@ -1,6 +1,7 @@
 package com.grp4.FFHelpers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -13,26 +14,29 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 // Contains all graphics and sounds resources
 public class AssetLoader {
 	
-	public static Texture texture, logo1Texture, logo2Texture, logo3Texture, heroTexture, spbUpTexture, hybridTexture;
-    public static TextureRegion logoSUTD, logoISTD, logoG4G, bgA, bgB, platform, fire,
-    singlePlayerButtonUp, singlePlayerButtonDown,
-    multiPlayerButtonUp, multiPlayerButtonDown,
-    exitButtonUp, exitButtonDown;
+	public static Texture texture, 
+		logo1Texture, logo2Texture, logo3Texture,
+		heroTexture, spbUpTexture, hybridTexture;
+    
+	public static TextureRegion logoSUTD, logoISTD, logoG4G,
+    	bgA, bgB, platform, fire,
+    	singlePlayerButtonUp, singlePlayerButtonDown,
+    	multiPlayerButtonUp, multiPlayerButtonDown,
+    	exitButtonUp, exitButtonDown,
+    	heroMid, heroDown, heroUp,
+    	villianMid, villianDown, villianUp;
     
     public static Animation heroAnimation, villianAnimation;
-    public static TextureRegion heroMid, heroDown, heroUp;
-    public static TextureRegion villianMid, villianDown, villianUp;
-    
     public static BitmapFont font, font2, shadow;
-    
     public static TextureAtlas atlas;
     public static AtlasRegion bgRegion, spbUpRegion, hybridRegion, heroRegion;
-    
     public static Sound dead, coin, fall, smashed, stapler;
+    public static Preferences prefs;
 
+    // Load all the resources
     public static void load() {
     	
-    	// loading splash screen logo
+    	//--------- SplashScreen Logos ----------
         logo1Texture = new Texture(Gdx.files.internal("data/SUTD Logo2.png"));
         logo1Texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         logoSUTD = new TextureRegion(logo1Texture, 0, 0, 256, 128);
@@ -45,7 +49,7 @@ public class AssetLoader {
         logo3Texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         logoG4G = new TextureRegion(logo3Texture, 0, 0, 256, 128);
 
-        // all other atlas region and texture for the game
+        //--------- All other textures ----------
         texture = new Texture(Gdx.files.internal("data/texture.png"));
         texture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
@@ -63,7 +67,7 @@ public class AssetLoader {
         heroTexture = heroRegion.getTexture();
         heroTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
         
-        // buttons
+        //--------- Buttons texture ----------
         singlePlayerButtonUp = new TextureRegion(spbUpTexture,
         		spbUpRegion.getRegionX(), spbUpRegion.getRegionY(),
         		spbUpRegion.getRegionWidth(), spbUpRegion.getRegionHeight());
@@ -91,7 +95,7 @@ public class AssetLoader {
         exitButtonUp.flip(false, true);
         exitButtonDown.flip(false, true);
         
-        // background
+        //---------- Background and Borders ----------
         bgA = new TextureRegion(hybridTexture,
         		bgRegion.getRegionX(), bgRegion.getRegionY(),
         		bgRegion.getRegionWidth(), bgRegion.getRegionHeight());
@@ -100,12 +104,11 @@ public class AssetLoader {
         		bgRegion.getRegionX(), bgRegion.getRegionY(),
         		bgRegion.getRegionWidth(), bgRegion.getRegionHeight());
         bgB.flip(true, false);
-        
-        // ceiling and floor
+
         fire = new TextureRegion(texture, 0, 43, 143, 11);
         fire.flip(false, true);
         
-        // local player sprite animation frames
+        //---------- Local player sprite animation and frames ---------
         int width = heroRegion.getRegionWidth()/3;
         int height = heroRegion.getRegionHeight();
         int xPos = heroRegion.getRegionX();
@@ -116,8 +119,12 @@ public class AssetLoader {
         heroMid.flip(false, true);
         heroUp = new TextureRegion(heroTexture, xPos+width-2, yPos, width-2, height);
         heroUp.flip(false, true);
+        
+        TextureRegion[] heros = { heroDown, heroMid, heroUp };
+        heroAnimation = new Animation(0.1f, heros);
+        heroAnimation.setPlayMode(Animation.LOOP_PINGPONG);
 
-        // remote player sprite animation frames
+        //---------- Remote player sprite animation and frames ---------
         villianDown = new TextureRegion(texture, 136, 0, 17, 12);
         villianDown.flip(false, true);
         villianMid = new TextureRegion(texture, 153, 0, 17, 12);
@@ -125,37 +132,68 @@ public class AssetLoader {
         villianUp = new TextureRegion(texture, 170, 0, 17, 12);
         villianUp.flip(false, true);
 
-        // local player sprite animation object
-        TextureRegion[] heros = { heroDown, heroMid, heroUp };
-        heroAnimation = new Animation(0.1f, heros);
-        heroAnimation.setPlayMode(Animation.LOOP_PINGPONG);
-        
-        // remote player sprite animation object
         TextureRegion[] villians = { villianDown, villianMid, villianUp };
         villianAnimation = new Animation(0.1f, villians);
         villianAnimation.setPlayMode(Animation.LOOP_PINGPONG);
 
-        // scrolling platforms
+        //--------- Scrolling Platforms ----------
         platform = new TextureRegion(texture, 136, 16, 22, 3);
         platform.flip(false, true);
         
-        // sounds
+        //--------- Audio ---------
         dead = Gdx.audio.newSound(Gdx.files.internal("data/dead.wav"));
         coin = Gdx.audio.newSound(Gdx.files.internal("data/coin.wav"));
         fall = Gdx.audio.newSound(Gdx.files.internal("data/fall.wav"));
         smashed = Gdx.audio.newSound(Gdx.files.internal("data/smashed.wav"));
         stapler = Gdx.audio.newSound(Gdx.files.internal("data/stapler.wav"));
         
-        // fonts and their shadows
+        //--------- Fonts ---------
         font = new BitmapFont(Gdx.files.internal("data/text.fnt"));
         font.setScale(.25f, -.25f);
         font2 = new BitmapFont(Gdx.files.internal("data/text2.fnt"));
         font2.setScale(.40f, -.40f);
         shadow = new BitmapFont(Gdx.files.internal("data/shadow.fnt"));
         shadow.setScale(.25f, -.25f);
-
+        
+        //--------- Local Preferences ----------
+        prefs = Gdx.app.getPreferences("FreeFall");
+        if (!prefs.contains("highScore")) {
+            prefs.putInteger("highScore", 0);
+        }
+        if (!prefs.contains("highScore2p")) {
+            prefs.putInteger("highScore2p", 0);
+        }
     }
     
+    //Receives an integer and maps it to the String highScore in prefs
+    public static void setHighScore(int val) {
+    	int recordScore = getHighScore();
+    	if (val > recordScore) {
+    		prefs.putInteger("highScore", val);
+    		prefs.flush();
+    	}
+    }
+    
+    //Receives an integer and maps it to the String highScore2p in prefs
+    public static void set2pHighScore(int val) {
+    	int recordScore = get2pHighScore();
+    	if (val > recordScore) {
+    		prefs.putInteger("highScore2p", val);
+    		prefs.flush();
+    	}
+    }
+    
+    // Retrieves the highScore
+    public static int getHighScore() {
+        return prefs.getInteger("highScore");
+    }
+    
+    // Retrieves highScore2p
+    public static int get2pHighScore() {
+        return prefs.getInteger("highScore2p");
+    }
+    
+    // Destroy loaded resources
     public static void dispose() {
     	logo1Texture.dispose();
     	logo2Texture.dispose();

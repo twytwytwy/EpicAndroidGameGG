@@ -12,13 +12,13 @@ import com.grp4.ui.SimpleButton;
 // game loop will check for touch inputs before updating the game
 public class InputHandler implements InputProcessor {
 
+	//---------- Game Objects ---------
 	private GameWorld myWorld;
 	private Character hero;
 
+	//---------- Input UI ----------
 	private List<SimpleButton> buttons;
-
 	private SimpleButton singlePlayerButton, multiPlayerButton, exitButton;
-
 	private float scaleFactorX;
 	private float scaleFactorY;
 

@@ -106,6 +106,8 @@ public class GameWorld {
 
 		switch (currentState) {
 		case MENU:
+			animateTitle(runTime, DELTA);
+			break;
 		case READY:
 			updateReady();
 			break;
@@ -130,6 +132,12 @@ public class GameWorld {
 		default:
 			break;
 		}
+	}
+	
+	public void animateTitle(float runTime, float delta) {
+		hero.animate(runTime, delta);
+		villian.animate2(runTime, delta);
+		hero.collidesNoSound(villian);
 	}
 
 	public void updateRunning(float delta) {
@@ -197,7 +205,6 @@ public class GameWorld {
 		if (fire.collides(hero) && hero.isAlive()) {
 			scroller.stop();
 			hero.die();
-			//villian.win();
 			winner = villian;
 			loser = hero;
 			gameover2p();
@@ -206,7 +213,6 @@ public class GameWorld {
 		if (fire.collides(villian) && villian.isAlive()) {
 			scroller.stop();
 			villian.die();
-			//hero.win();
 			winner = hero;
 			loser = villian;
 			gameover2p();
@@ -333,6 +339,7 @@ public class GameWorld {
 			currentState = GameState.GAMEOVER2P;
 			dead.play();
 			fall.play();
+			AssetLoader.set2pHighScore(finalScore);
 		}
 	}
 	public void gameover() {
@@ -340,6 +347,7 @@ public class GameWorld {
 			currentState = GameState.GAMEOVER;
 			dead.play();
 			fall.play();
+			AssetLoader.setHighScore(finalScore);
 		}
 	}
 	public void connectFail() {
