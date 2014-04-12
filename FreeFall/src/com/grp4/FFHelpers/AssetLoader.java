@@ -159,6 +159,7 @@ public class AssetLoader {
     public static void dispose() {
     	logo1Texture.dispose();
     	logo2Texture.dispose();
+    	logo3Texture.dispose();
         texture.dispose();
         heroTexture.dispose();
         spbUpTexture.dispose();
@@ -166,6 +167,9 @@ public class AssetLoader {
         
         dead.dispose();
         coin.dispose();
+        fall.dispose();
+        stapler.dispose();
+        smashed.dispose();
         
         font.dispose();
         font2.dispose();
