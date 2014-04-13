@@ -40,7 +40,7 @@ public class GameScreen implements Screen {
 		// initialise touch input handler
 		Gdx.input.setInputProcessor(new InputHandler(world, screenWidth / gameWidth, screenHeight / gameHeight));
 		// initialise game renderer
-		renderer = new GameRenderer(world, (int) gameHeight, (int) gameWidth);
+		renderer = new GameRenderer(world, (int) gameWidth, (int) gameHeight);
 	}
 
 	// This method will be called 60x a second.

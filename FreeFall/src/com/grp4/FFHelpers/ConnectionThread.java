@@ -49,6 +49,7 @@ public class ConnectionThread extends Thread{
 		//---------- Establishing connection with Server ----------
 		int connectionStage = 0;
 		try {
+			
 			hostSocket = new Socket(hostname, PORTNUMBER);
 			connectionStage ++; // 1
 			hostSocket.setSoTimeout(TIMEOUT);
@@ -57,8 +58,10 @@ public class ConnectionThread extends Thread{
 			reader = new BufferedReader(new InputStreamReader(
 					hostSocket.getInputStream()));
 			connectionStage ++; // 3
-			world.connected();
+			
+			world.connected(); // flag connection established to game world
 			waiting = true;
+		
 		} catch (Exception e) {
 			System.err.println("CONNECTION: Fatal Initialisation Error: Failed to connect with Server.");
 			world.disconnected(); // flag disconnection to game world
@@ -72,7 +75,7 @@ public class ConnectionThread extends Thread{
 					String position = reader.readLine();
 					gameOn = true;
 					world.setCD("Ready");
-					world.p2connected(seed, position);
+					world.setUp2p(seed, position);
 				} else {
 					System.err.println("CONNECTION: Fatal Setup Error: Server dis-synchronised.");
 					world.disconnected(); // flag disconnection to game world
