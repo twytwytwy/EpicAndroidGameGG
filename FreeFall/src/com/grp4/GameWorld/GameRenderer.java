@@ -1,5 +1,6 @@
 package com.grp4.GameWorld;
 
+import java.sql.Time;
 import java.util.List;
 
 import aurelienribon.tweenengine.Tween;
@@ -39,24 +40,21 @@ public class GameRenderer {
 	private int gameHeight, gameWidth, midpointY, midpointX;
 
 	//---------- Game Objects ----------
-	private Character hero, villian;
+	private Character hero, villain;
 	private ScrollHandler scroller;
 	private Platforms[] platforms;
-	private Fire flames;
 	private Background bg1, bg2;
 
 	//---------- Game Objects Data -----------
 	private int HERO_WIDTH = GameWorld.CHARACTER_WIDTH;
 	private int HERO_HEIGHT = GameWorld.CHARACTER_HEIGHT;
-	private int FIRE_WIDTH = GameWorld.FIRE_WIDTH;
-	private int FIRE_HEIGHT = GameWorld.FIRE_HEIGHT;
 	private int PLATFORM_WIDTH = GameWorld.PLATFORM_WIDTH;
 	private int PLATFORM_HEIGHT = GameWorld.PLATFORM_HEIGHT;
 
 	//---------- Graphic Resources ----------
-	private TextureRegion bgA, bgB, platform, fire;
-	private Animation heroAnimation, villianAnimation;
-	private BitmapFont font, font2, shadow;
+	private TextureRegion bgA, bgB, platform;
+	private Animation heroAnimation, villainAnimation;
+	private BitmapFont font, font2, shadow, fontSmall, font2small, shadowSmall;
 
 	//---------- Tween Helpers -----------
 	private static TweenManager manager;
@@ -107,8 +105,7 @@ public class GameRenderer {
 	// Initialise Game Objects
 	private void initGameObjects() {
 		hero = myWorld.getHero();
-		villian = myWorld.getVillian();
-		flames = myWorld.getFire();
+		villain = myWorld.getvillain();
 		scroller = myWorld.getScroller();
 		platforms = scroller.getPlatforms();
 		bg1 = scroller.getBg1();
@@ -120,12 +117,14 @@ public class GameRenderer {
 		bgA = AssetLoader.bgA;
 		bgB = AssetLoader.bgB;
 		heroAnimation = AssetLoader.heroAnimation;
-		villianAnimation = AssetLoader.villianAnimation;
-		fire = AssetLoader.fire;
+		villainAnimation = AssetLoader.villainAnimation;
 		platform = AssetLoader.platform;
 		font = AssetLoader.font;
 		font2 = AssetLoader.font2;
 		shadow = AssetLoader.shadow;
+		fontSmall = AssetLoader.fontSmall;
+		font2small = AssetLoader.font2small;
+		shadowSmall = AssetLoader.shadowSmall;
 	}
 
 	
@@ -135,15 +134,6 @@ public class GameRenderer {
 	private void drawBackground() {
 		batcher.draw(bgA, bg1.getX(), bg1.getY(), bg1.getWidth(), bg1.getHeight());
 		batcher.draw(bgB, bg2.getX(), bg2.getY(), bg2.getWidth(), bg2.getHeight());
-	}
-
-	// Paints top and bottom border
-	private void drawFire() {
-
-		batcher.draw(fire, flames.getX(), flames.getY1(), FIRE_WIDTH,
-				FIRE_HEIGHT);
-		batcher.draw(fire, flames.getX(), flames.getY2(), FIRE_WIDTH,
-				FIRE_HEIGHT);
 	}
 
 	// Paints all platforms
@@ -164,8 +154,8 @@ public class GameRenderer {
 	private void drawBothCharacters(float runTime) {
 		batcher.draw(heroAnimation.getKeyFrame(runTime), hero.getX(),
 				hero.getY(), HERO_WIDTH, HERO_HEIGHT);
-		batcher.draw(villianAnimation.getKeyFrame(runTime), villian.getX(),
-				villian.getY(), HERO_WIDTH, HERO_HEIGHT);
+		batcher.draw(villainAnimation.getKeyFrame(runTime), villain.getX(),
+				villain.getY(), HERO_WIDTH, HERO_HEIGHT);
 	}
 
 	// Paints Menu Screen UI
@@ -188,6 +178,20 @@ public class GameRenderer {
 	// Paints exit button at gameover
 	private void drawExitButton() {
 		buttons.get(2).draw(batcher);
+	}
+	
+	private void drawLoadingDots(float runTime) {
+		float timing = runTime % 2;
+		if (timing < 0.6) {
+			shadow.draw(batcher, ".", midpointX - (10), 86);
+			font.draw(batcher, ".", midpointX - (10 - 1), 85);
+		} else if (timing < 1.3) {
+			shadow.draw(batcher, " .", midpointX - (10), 86);
+			font.draw(batcher, " .", midpointX - (10- 1), 85);
+		} else if (timing < 2) {
+			shadow.draw(batcher, "  .", midpointX - (10), 86);
+			font.draw(batcher, "  .", midpointX - (10 - 1), 85);
+		}
 	}
 
 	// Screen transition method
@@ -220,7 +224,6 @@ public class GameRenderer {
 		// always on display (no need transparency due to regular shapes)
 		drawBackground();
 		drawPlatforms();
-		drawFire();
 		
 		batcher.enableBlending(); // enable transparency for PNG fonts and sprites
 		
@@ -230,6 +233,17 @@ public class GameRenderer {
 		case MENU:
 			drawBothCharacters(runTime);
 			drawMenuUI();
+			String scoreString;
+			float timing3 = runTime % 4;
+			if (timing3 < 2) {
+				scoreString = "HighScore:         " + myWorld.getPrevHighscore();
+				font2small.draw(batcher, scoreString, 2, gameHeight - 9);
+				font2small.draw(batcher, "(1-Player)", midpointX + 20, gameHeight - 9);
+			} else if (timing3 < 4) {
+				scoreString = "HighScore:         " + myWorld.getPrevHighscore2p();
+				font2small.draw(batcher, scoreString, 2, gameHeight - 9);
+				font2small.draw(batcher, "(2-Player)", midpointX + 20, gameHeight - 9);
+			}
 			break;
 		
 		// SinglePlayer: gameplay shows 1 character and score
@@ -240,9 +254,13 @@ public class GameRenderer {
 			
 		// SinglePlayer: pre-gameplay state shows instruction
 		case READY:
-			font2.draw(batcher, "Touch me", (136 / 2) - (42 - 1), 75);
+			font2.draw(batcher, "Tap to Move", midpointX - 49, 75);
+			float timing2 = runTime % 1;
+			if (timing2 > 0.3) {
+				font2small.draw(batcher, "-- -- -- Avoid -- -- --", midpointX - 36, 3);
+				font2small.draw(batcher, "-- -- -- Avoid -- -- --", midpointX - 36, gameHeight - 9);
+			}
 			drawHero(runTime);
-			drawScore();
 			break;
 			
 		// SinglePlayer: gameover shows character, messages, highscore and exit button
@@ -261,23 +279,36 @@ public class GameRenderer {
 				shadow.draw(batcher, "Connecting", midpointX - (50), 76);
 				font.draw(batcher, "Connecting", midpointX - (50 - 1), 75);
 			} else {
-				shadow.draw(batcher, "Loading", midpointX - (50), 76);
-				font.draw(batcher, "Loading", midpointX - (50 - 1), 75);
+				shadow.draw(batcher, "Waiting", midpointX - (32), 56);
+				font.draw(batcher, "Waiting", midpointX - (32 - 1), 55);
+				shadow.draw(batcher, "For Player2", midpointX - (53), 76);
+				font.draw(batcher, "For Player2", midpointX - (53 - 1), 75);
 			}
+			drawLoadingDots(runTime);
 			break;
 		
 		// MultiPlayer: notify the termination of connection
 		case EXITING:
-			shadow.draw(batcher, "Exit", midpointX - (35), 76);
-			font.draw(batcher, "Exit", midpointX - (35 - 1), 75);
+			shadow.draw(batcher, "Exiting", midpointX - (30), 76);
+			font.draw(batcher, "Exiting", midpointX - (30 - 1), 75);
+			drawLoadingDots(runTime);
 			break;
 		
 		// MultiPlayer: notify connection error
 		case CONNECTFAIL:
-			shadow.draw(batcher, "Connect", 25, 56);
-			font.draw(batcher, "Connect", 24, 55);
-			shadow.draw(batcher, "Fail", 23, 76);
-			font.draw(batcher, "Fail", 24, 75);
+			shadow.draw(batcher, "Connection", midpointX - (49), 56);
+			font.draw(batcher, "Connection", midpointX - (49 - 1), 55);
+			shadow.draw(batcher, "Error", midpointX - (25), 76);
+			font.draw(batcher, "Error", midpointX - (25 - 1), 75);
+			
+			int textAlignX = midpointX - 42;
+			int textAlignY = 106;
+			shadowSmall.draw(batcher, "Sorry! An error", textAlignX, textAlignY);
+			fontSmall.draw(batcher, "Sorry! An error", textAlignX - 1, textAlignY - 1);
+			shadowSmall.draw(batcher, "occured. Please", textAlignX, textAlignY + 20);
+			fontSmall.draw(batcher, "occured. Please", textAlignX - 1, textAlignY + 20 - 1);
+			shadowSmall.draw(batcher, "try again Later.", textAlignX, textAlignY + 40);
+			fontSmall.draw(batcher, "try again Later.", textAlignX - 1, textAlignY + 40 - 1);
 			break;
 		
 		// MultiPlayer: pre-gameplay state shows 2 characters, countdown message and score
@@ -285,7 +316,6 @@ public class GameRenderer {
 			String countdown = myWorld.getCD();
 			font2.draw(batcher, countdown, midpointX - (countdown.length() * 5) + 1, 75);
 			drawBothCharacters(runTime);
-			drawScore();
 			break;
 			
 		// MultiPlayer: gameplay state shows 2 characters and score
@@ -298,17 +328,22 @@ public class GameRenderer {
 		case GAMEOVER2P:
 			drawScore();
 			drawBothCharacters(runTime);
-			String displayString = "";
 			if (myWorld.isWin()) {
-				displayString = "You  WON!";
+				font2.draw(batcher, "You", midpointX - 15, 45);
+				font2.draw(batcher, "WON!", midpointX - 20, 65);
+				font2.draw(batcher, "2P Highscore", 10, 120);
+				font2.draw(batcher, "" + myWorld.getPrevHighscore2p(), midpointX - 5, 135);
 			} else if (myWorld.isLose()) {
-				displayString = "You LOST!";
+				font2.draw(batcher, "You", midpointX - 15, 45);
+				font2.draw(batcher, "LOST!", midpointX - 18, 65);
+				font2.draw(batcher, "2P Highscore", 10, 120);
+				font2.draw(batcher, "" + myWorld.getPrevHighscore2p(), midpointX - 5, 135);
 			} else if (myWorld.isDraw()) {
-				displayString = "it's  A  DRAW!";
+				font2.draw(batcher, "it's  A", midpointX - 20, 45);
+				font2.draw(batcher, "DRAW!", midpointX - 24, 65);
+				font2.draw(batcher, "2P Highscore", 10, 120);
+				font2.draw(batcher, "" + myWorld.getPrevHighscore2p(), midpointX - 5, 135);
 			}
-			font2.draw(batcher, displayString, midpointX - (displayString.length()*4), 65);
-			font2.draw(batcher, "2P Highscore", 10, 120);
-			font2.draw(batcher, "" + myWorld.getPrevHighscore2p(), midpointX - 5, 135);
 			drawExitButton();
 			break;
 		

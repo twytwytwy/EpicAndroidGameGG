@@ -16,21 +16,26 @@ public class AssetLoader {
 	
 	public static Texture texture, 
 		logo1Texture, logo2Texture, logo3Texture,
-		heroTexture, spbUpTexture, hybridTexture;
+		heroTexture, villainTexture, bgTexture, 
+		player1UpTexture, player1DownTexture, 
+		player2UpTexture, player2DownTexture,
+		exitUpTexture, exitDownTexture;
     
 	public static TextureRegion logoSUTD, logoISTD, logoG4G,
-    	bgA, bgB, platform, fire,
+    	bgA, bgB, platform,
     	singlePlayerButtonUp, singlePlayerButtonDown,
     	multiPlayerButtonUp, multiPlayerButtonDown,
     	exitButtonUp, exitButtonDown,
     	heroMid, heroDown, heroUp,
-    	villianMid, villianDown, villianUp;
+    	villainMid, villainDown, villainUp;
     
-    public static Animation heroAnimation, villianAnimation;
-    public static BitmapFont font, font2, shadow;
+    public static Animation heroAnimation, villainAnimation;
+    public static BitmapFont fontSmall, shadowSmall, font, shadow, font2small, font2;
     public static TextureAtlas atlas;
-    public static AtlasRegion bgRegion, spbUpRegion, hybridRegion, heroRegion;
-    public static Sound dead, coin, fall, smashed, stapler;
+    public static AtlasRegion bgRegion, player1UpRegion, player1DownRegion, 
+    	player2UpRegion, player2DownRegion, exitUpRegion, exitDownRegion,
+    	heroRegion, villainRegion;
+    public static Sound dead, fall, smashed, stapler;
     public static Preferences prefs;
 
     // Load all the resources
@@ -56,58 +61,76 @@ public class AssetLoader {
         atlas = new TextureAtlas(Gdx.files.internal("data/texture3.atlas"));
         
         bgRegion = atlas.findRegion("cloud3");
-        spbUpRegion = atlas.findRegion("playbuttonblue");
-        hybridRegion = atlas.findRegion("playbuttonbluedown");
-        heroRegion = atlas.findRegion("twitter-bird-sprite2");
+        player1UpRegion = atlas.findRegion("1playerup");
+        player1DownRegion = atlas.findRegion("1playerdown");
+        player2UpRegion = atlas.findRegion("2playerup");
+        player2DownRegion = atlas.findRegion("2playerdown");
+        exitUpRegion = atlas.findRegion("exitup");
+        exitDownRegion = atlas.findRegion("exitdown");
+        heroRegion = atlas.findRegion("birdself");
+        villainRegion = atlas.findRegion("birdother");
         
-        spbUpTexture = spbUpRegion.getTexture();
-        spbUpTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
-        hybridTexture = hybridRegion.getTexture();
-        hybridTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        bgTexture = bgRegion.getTexture();
+        bgTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        
+        player1UpTexture = player1UpRegion.getTexture();
+        player1UpTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        player1DownTexture = player1DownRegion.getTexture();
+        player1DownTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        
+        player2UpTexture = player2UpRegion.getTexture();
+        player2UpTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        player2DownTexture = player2DownRegion.getTexture();
+        player2DownTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        
+        exitUpTexture = exitUpRegion.getTexture();
+        exitUpTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        exitDownTexture = exitDownRegion.getTexture();
+        exitDownTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        
         heroTexture = heroRegion.getTexture();
         heroTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        villainTexture = villainRegion.getTexture();
+        villainTexture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
         
         //--------- Buttons texture ----------
-        singlePlayerButtonUp = new TextureRegion(spbUpTexture,
-        		spbUpRegion.getRegionX(), spbUpRegion.getRegionY(),
-        		spbUpRegion.getRegionWidth(), spbUpRegion.getRegionHeight());
-        singlePlayerButtonDown = new TextureRegion(hybridTexture, 
-        		hybridRegion.getRegionX(), hybridRegion.getRegionY(),
-        		hybridRegion.getRegionWidth(), hybridRegion.getRegionHeight());
+        singlePlayerButtonUp = new TextureRegion(player1UpTexture,
+        		player1UpRegion.getRegionX(), player1UpRegion.getRegionY(),
+        		player1UpRegion.getRegionWidth(), player1UpRegion.getRegionHeight());
+        singlePlayerButtonDown = new TextureRegion(player1DownTexture, 
+        		player1DownRegion.getRegionX(), player1DownRegion.getRegionY(),
+        		player1DownRegion.getRegionWidth(), player1DownRegion.getRegionHeight());
         singlePlayerButtonUp.flip(false, true);
         singlePlayerButtonDown.flip(false, true);
         
-        multiPlayerButtonUp = new TextureRegion(spbUpTexture,
-        		spbUpRegion.getRegionX(), spbUpRegion.getRegionY(),
-        		spbUpRegion.getRegionWidth(), spbUpRegion.getRegionHeight());
-        multiPlayerButtonDown = new TextureRegion(hybridTexture, 
-        		hybridRegion.getRegionX(), hybridRegion.getRegionY(),
-        		hybridRegion.getRegionWidth(), hybridRegion.getRegionHeight());
+        multiPlayerButtonUp = new TextureRegion(player2UpTexture,
+        		player2UpRegion.getRegionX(), player2UpRegion.getRegionY(),
+        		player2UpRegion.getRegionWidth(), player2UpRegion.getRegionHeight());
+        multiPlayerButtonDown = new TextureRegion(player2DownTexture, 
+        		player2DownRegion.getRegionX(), player2DownRegion.getRegionY(),
+        		player2DownRegion.getRegionWidth(), player2DownRegion.getRegionHeight());
         multiPlayerButtonUp.flip(false, true);
         multiPlayerButtonDown.flip(false, true);
         
-        exitButtonUp = new TextureRegion(spbUpTexture,
-        		spbUpRegion.getRegionX(), spbUpRegion.getRegionY(),
-        		spbUpRegion.getRegionWidth(), spbUpRegion.getRegionHeight());
-        exitButtonDown = new TextureRegion(hybridTexture, 
-        		hybridRegion.getRegionX(), hybridRegion.getRegionY(),
-        		hybridRegion.getRegionWidth(), hybridRegion.getRegionHeight());
+        exitButtonUp = new TextureRegion(exitUpTexture,
+        		exitUpRegion.getRegionX(), exitUpRegion.getRegionY(),
+        		exitUpRegion.getRegionWidth(), exitUpRegion.getRegionHeight());
+        exitButtonDown = new TextureRegion(exitDownTexture, 
+        		exitDownRegion.getRegionX(), exitDownRegion.getRegionY(),
+        		exitDownRegion.getRegionWidth(), exitDownRegion.getRegionHeight());
         exitButtonUp.flip(false, true);
         exitButtonDown.flip(false, true);
         
         //---------- Background and Borders ----------
-        bgA = new TextureRegion(hybridTexture,
+        bgA = new TextureRegion(bgTexture,
         		bgRegion.getRegionX(), bgRegion.getRegionY(),
         		bgRegion.getRegionWidth(), bgRegion.getRegionHeight());
         bgA.flip(false, true);
-        bgB = new TextureRegion(hybridTexture,
+        bgB = new TextureRegion(bgTexture,
         		bgRegion.getRegionX(), bgRegion.getRegionY(),
         		bgRegion.getRegionWidth(), bgRegion.getRegionHeight());
         bgB.flip(true, false);
 
-        fire = new TextureRegion(texture, 0, 43, 143, 11);
-        fire.flip(false, true);
-        
         //---------- Local player sprite animation and frames ---------
         int width = heroRegion.getRegionWidth()/3;
         int height = heroRegion.getRegionHeight();
@@ -125,16 +148,20 @@ public class AssetLoader {
         heroAnimation.setPlayMode(Animation.LOOP_PINGPONG);
 
         //---------- Remote player sprite animation and frames ---------
-        villianDown = new TextureRegion(texture, 136, 0, 17, 12);
-        villianDown.flip(false, true);
-        villianMid = new TextureRegion(texture, 153, 0, 17, 12);
-        villianMid.flip(false, true);
-        villianUp = new TextureRegion(texture, 170, 0, 17, 12);
-        villianUp.flip(false, true);
-
-        TextureRegion[] villians = { villianDown, villianMid, villianUp };
-        villianAnimation = new Animation(0.1f, villians);
-        villianAnimation.setPlayMode(Animation.LOOP_PINGPONG);
+        int vil_width = villainRegion.getRegionWidth()/3;
+        int vil_height = villainRegion.getRegionHeight();
+        int vil_xPos = villainRegion.getRegionX();
+        int vil_yPos = villainRegion.getRegionY();
+        villainDown = new TextureRegion(villainTexture, vil_xPos-2, vil_yPos, vil_width-2, vil_height);
+        villainDown.flip(false, true);
+        villainMid = new TextureRegion(villainTexture, vil_xPos+2*width-2, vil_yPos, vil_width-2, vil_height);
+        villainMid.flip(false, true);
+        villainUp = new TextureRegion(villainTexture, vil_xPos+width-2, vil_yPos, vil_width-2, vil_height);
+        villainUp.flip(false, true);
+        
+        TextureRegion[] villains = { villainDown, villainMid, villainUp };
+        villainAnimation = new Animation(0.1f, villains);
+        villainAnimation.setPlayMode(Animation.LOOP_PINGPONG);
 
         //--------- Scrolling Platforms ----------
         platform = new TextureRegion(texture, 136, 16, 22, 3);
@@ -142,7 +169,6 @@ public class AssetLoader {
         
         //--------- Audio ---------
         dead = Gdx.audio.newSound(Gdx.files.internal("data/dead.wav"));
-        coin = Gdx.audio.newSound(Gdx.files.internal("data/coin.wav"));
         fall = Gdx.audio.newSound(Gdx.files.internal("data/fall.wav"));
         smashed = Gdx.audio.newSound(Gdx.files.internal("data/smashed.wav"));
         stapler = Gdx.audio.newSound(Gdx.files.internal("data/stapler.wav"));
@@ -150,10 +176,19 @@ public class AssetLoader {
         //--------- Fonts ---------
         font = new BitmapFont(Gdx.files.internal("data/text.fnt"));
         font.setScale(.25f, -.25f);
-        font2 = new BitmapFont(Gdx.files.internal("data/text2.fnt"));
-        font2.setScale(.40f, -.40f);
         shadow = new BitmapFont(Gdx.files.internal("data/shadow.fnt"));
         shadow.setScale(.25f, -.25f);
+        
+        fontSmall = new BitmapFont(Gdx.files.internal("data/text.fnt"));
+        fontSmall.setScale(.15f, -.15f);
+        shadowSmall = new BitmapFont(Gdx.files.internal("data/shadow.fnt"));
+        shadowSmall.setScale(.15f, -.15f);
+        
+        font2 = new BitmapFont(Gdx.files.internal("data/text2.fnt"));
+        font2.setScale(.4f, -.4f);
+        font2small = new BitmapFont(Gdx.files.internal("data/text2.fnt"));
+        font2small.setScale(.2f, -.2f);
+        
         
         //--------- Local Preferences ----------
         prefs = Gdx.app.getPreferences("FreeFall");
@@ -200,11 +235,16 @@ public class AssetLoader {
     	logo3Texture.dispose();
         texture.dispose();
         heroTexture.dispose();
-        spbUpTexture.dispose();
-        hybridTexture.dispose();
+        villainTexture.dispose();
+        bgTexture.dispose();
+		player1UpTexture.dispose();
+		player1DownTexture.dispose();
+		player2UpTexture.dispose();
+		player2DownTexture.dispose();
+		exitUpTexture.dispose();
+		exitDownTexture.dispose();
         
         dead.dispose();
-        coin.dispose();
         fall.dispose();
         stapler.dispose();
         smashed.dispose();
@@ -212,6 +252,9 @@ public class AssetLoader {
         font.dispose();
         font2.dispose();
         shadow.dispose();
+        fontSmall.dispose();
+        font2small.dispose();
+        shadowSmall.dispose();
     }
 
 }

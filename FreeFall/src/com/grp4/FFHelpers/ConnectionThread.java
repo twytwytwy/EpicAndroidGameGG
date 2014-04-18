@@ -30,13 +30,13 @@ public class ConnectionThread extends Thread{
 	
 	//--------- Game Objects ----------
 	private GameWorld world;
-	private Character hero, villian;
+	private Character hero, villain;
 	
 	public ConnectionThread(GameWorld world, CyclicBarrier barrier) {
 		this.world = world;
 		this.barrier = barrier;
 		this.hero = world.getHero();
-		this.villian = world.getVillian();
+		this.villain = world.getvillain();
 		waiting = false;
 		gameOn = false;
 		broken = false;
@@ -115,10 +115,10 @@ public class ConnectionThread extends Thread{
 					if (receivedCommand.equals("TO")) {
 						hero.onClick();
 					} else if (receivedCommand.equals("OT")) {
-						villian.onClick();
+						villain.onClick();
 					} else if (receivedCommand.equals("TT")) {
 						hero.onClick();
-						villian.onClick();
+						villain.onClick();
 					}
 					
 					barrier.await();

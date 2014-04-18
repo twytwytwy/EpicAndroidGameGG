@@ -2,6 +2,7 @@ package com.grp4.FreeFall;
 
 import com.badlogic.gdx.Game;
 import com.grp4.FFHelpers.AssetLoader;
+import com.grp4.Screens.GameScreen;
 import com.grp4.Screens.SplashScreen;
 
 // Main Method of "FreeFall"

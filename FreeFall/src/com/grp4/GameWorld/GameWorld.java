@@ -16,7 +16,7 @@ import com.grp4.GameObject.ScrollHandler;
 public class GameWorld {
 	
 	//---------- Game Objects ----------
-	private Character hero, villian, winner, loser;
+	private Character hero, villain, winner, loser;
 	private ScrollHandler scroller;
 	private Fire fire;
 	
@@ -31,7 +31,7 @@ public class GameWorld {
 	public static final int CHARACTER_WIDTH = 17; // character dimensions
 	public static final int CHARACTER_HEIGHT = 12;
 	public static final int FIRE_WIDTH = 143;
-	public static final int FIRE_HEIGHT = 11;
+	public static final int FIRE_HEIGHT = 1;
 	
 	public static final int GRAVITY = 50;
 	public static final int MOVEMENT = 80;
@@ -95,8 +95,8 @@ public class GameWorld {
 		this.midPointX = (int) gameWidth / 2;
 		this.midPointY = (int) gameHeight / 2;
 		
-		hero = new Character(midPointX - 10, midPointY - 20, CHARACTER_WIDTH, CHARACTER_HEIGHT);
-		villian = new Character(midPointX - 10, midPointY - 20, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+		hero = new Character(midPointX - 5, midPointY - 20, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+		villain = new Character(midPointX - 5, midPointY - 20, CHARACTER_WIDTH, CHARACTER_HEIGHT);
 		scroller = new ScrollHandler(this, midPointY);
 		fire = new Fire(0, 0, gameHeight - FIRE_HEIGHT, FIRE_WIDTH, FIRE_HEIGHT);
 
@@ -155,8 +155,8 @@ public class GameWorld {
 	// Animate character objects at Menu Screen
 	public void animateTitle(float runTime) {
 		hero.animate(runTime, DELTA);
-		villian.animate2(runTime, DELTA);
-		hero.collidesNoSound(villian);
+		villain.animate2(runTime, DELTA);
+		hero.collidesNoSound(villain);
 	}
 	
 	// SinglePlayer: oscillates character at pre-gameplay preparation screen
@@ -200,7 +200,7 @@ public class GameWorld {
 		// display winner and loser or a draw
 		if (ggState == GGState.DRAW) {
 			hero.update(DELTA);
-			villian.update(DELTA);
+			villain.update(DELTA);
 		} else {
 			winner.updateReady(runTime);
 			loser.update(DELTA);
@@ -225,14 +225,14 @@ public class GameWorld {
 
 		// update characters and scrolling platform positions
 		hero.update(DELTA);
-		villian.update(DELTA);
+		villain.update(DELTA);
 		scroller.update(DELTA);
 
 		// collision detection for all objects
-		if (hero.isAlive() && villian.isAlive()) {
+		if (hero.isAlive() && villain.isAlive()) {
 			scroller.collides(hero);
-			scroller.collides(villian);
-			hero.collides(villian);
+			scroller.collides(villain);
+			hero.collides(villain);
 		}
 		
 		// collision detection for characters and fire
@@ -240,21 +240,21 @@ public class GameWorld {
 		if (fire.collides(hero) && hero.isAlive()) {
 			scroller.stop();
 			hero.die();
-			winner = villian;
+			winner = villain;
 			loser = hero;
 			gameover2p();
 			ggState = GGState.LOSE;
 		} 
-		if (fire.collides(villian) && villian.isAlive()) {
+		if (fire.collides(villain) && villain.isAlive()) {
 			scroller.stop();
-			villian.die();
+			villain.die();
 			winner = hero;
-			loser = villian;
+			loser = villain;
 			gameover2p();
 			ggState = GGState.WIN;
 		}
 		// check whether it is a draw
-		if (villian.isDead() && hero.isDead()) {
+		if (villain.isDead() && hero.isDead()) {
 			ggState = GGState.DRAW;
 		}
 	}
@@ -329,10 +329,10 @@ public class GameWorld {
 		// set character position
 		if (position == 1) {
 			hero.setPlayer1();
-			villian.setPlayer2();
+			villain.setPlayer2();
 		} else {
 			hero.setPlayer2();
-			villian.setPlayer1();
+			villain.setPlayer1();
 		}
 	}
 	
@@ -367,8 +367,8 @@ public class GameWorld {
 	public Character getHero() {
 		return hero;
 	}
-	public Character getVillian() {
-		return villian;
+	public Character getvillain() {
+		return villain;
 	}
 	public ScrollHandler getScroller() {
 		return scroller;
@@ -461,7 +461,7 @@ public class GameWorld {
 		finalScore = 0;
 		score = 0;
 		hero.onRestart();
-		villian.onRestart();
+		villain.onRestart();
 		scroller.onRestart();
 	}
 	
